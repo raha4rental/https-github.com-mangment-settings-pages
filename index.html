@@ -1,0 +1,1555 @@
+<!doctype html>
+<html lang="ar" dir="rtl" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام تشغيل الشقق</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="_sdk/data_sdk.js"></script>
+  <script src="_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab-button.active {
+      border-bottom-color: currentColor;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+    }
+    
+    .stat-card {
+      text-align: center;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+    
+    button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      background: #2563eb;
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: #4b5563;
+    }
+    
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    
+    .btn-success:hover:not(:disabled) {
+      background: #059669;
+    }
+    
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .btn-danger:hover:not(:disabled) {
+      background: #dc2626;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90%;
+      overflow-y: auto;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    th {
+      background: #f3f4f6;
+      padding: 1rem;
+      text-align: right;
+      font-weight: 600;
+    }
+    
+    td {
+      padding: 1rem;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    tr:hover {
+      background: #f9fafb;
+    }
+    
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #1f2937;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 2000;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full" style="background: #f3f4f6; overflow-y: auto;"><!-- Header -->
+   <header style="background: #1f2937; color: white; padding: 1.5rem 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h1 id="system-title" style="font-size: 1.875rem; font-weight: bold; margin: 0;">نظام تشغيل الشقق</h1>
+    <p style="opacity: 0.8; margin-top: 0.25rem;">إدارة متكاملة للمواقع الخمسة</p>
+   </header><!-- Navigation Tabs -->
+   <nav style="background: white; padding: 0 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    <div style="display: flex; gap: 1rem;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button>
+    </div>
+   </nav><!-- Main Content -->
+   <main style="padding: 2rem; max-width: 1400px; margin: 0 auto;"><!-- Dashboard Tab -->
+    <div id="dashboard-tab" class="tab-content">
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+      <div class="stat-card">
+       <div class="stat-label">
+        شقق جاهزة
+       </div>
+       <div class="stat-number" id="ready-count" style="color: #10b981;">
+        0
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-label">
+        تحتاج تنظيف
+       </div>
+       <div class="stat-number" id="cleaning-count" style="color: #ef4444;">
+        0
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-label">
+        دخول اليوم
+       </div>
+       <div class="stat-number" id="checkin-count" style="color: #3b82f6;">
+        0
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-label">
+        خروج اليوم
+       </div>
+       <div class="stat-number" id="checkout-count" style="color: #f59e0b;">
+        0
+       </div>
+      </div>
+      <div class="stat-card">
+       <div class="stat-label">
+        مهام تنظيف
+       </div>
+       <div class="stat-number" id="tasks-count" style="color: #8b5cf6;">
+        0
+       </div>
+      </div>
+     </div>
+     <div class="card">
+      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">حجوزات اليوم</h2>
+      <div id="today-bookings" style="min-height: 100px;"></div>
+     </div>
+     <div class="card">
+      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">نواقص المستلزمات</h2>
+      <div id="low-inventory" style="min-height: 100px;"></div>
+     </div>
+    </div><!-- Bookings Tab -->
+    <div id="bookings-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة الحجوزات</h2><button class="btn-primary" onclick="openBookingModal()">+ حجز جديد</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="bookings-table">
+        <thead>
+         <tr>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>المستأجر</th>
+          <th>الهاتف</th>
+          <th>تاريخ الدخول</th>
+          <th>تاريخ الخروج</th>
+          <th>الضيوف</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="bookings-body"></tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Units Tab -->
+    <div id="units-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة الشقق</h2><button class="btn-primary" onclick="openUnitModal()">+ شقة جديدة</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="units-table">
+        <thead>
+         <tr>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>النوع</th>
+          <th>الحالة</th>
+          <th>آخر تنظيف</th>
+          <th>جاهزة للحجز</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="units-body"></tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Cleaning Tab -->
+    <div id="cleaning-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">مهام التنظيف</h2><button class="btn-primary" onclick="openCleaningModal()">+ مهمة تنظيف</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="cleaning-table">
+        <thead>
+         <tr>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>السبب</th>
+          <th>التاريخ</th>
+          <th>البدء</th>
+          <th>الانتهاء</th>
+          <th>المسؤول</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="cleaning-body"></tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Inspection Tab -->
+    <div id="inspection-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">سجل التفتيش</h2><button class="btn-primary" onclick="openInspectionModal()">+ تفتيش جديد</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="inspection-table">
+        <thead>
+         <tr>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>التاريخ</th>
+          <th>Wi-Fi</th>
+          <th>النظافة</th>
+          <th>المستلزمات</th>
+          <th>ملاحظات</th>
+          <th>معتمدة</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="inspection-body"></tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Inventory Tab -->
+    <div id="inventory-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة المستلزمات</h2>
+      <div style="display: flex; gap: 1rem;"><button class="btn-success" onclick="openSetupModal()">⚡ إعداد شقة جديدة</button> <button class="btn-primary" onclick="openInventoryModal()">+ صنف مخصص</button>
+      </div>
+     </div><!-- Filters -->
+     <div class="card" style="margin-bottom: 1.5rem;">
+      <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">🔍 تصفية المستلزمات</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+       <div class="form-group" style="margin-bottom: 0;"><label for="filter-location">الموقع</label> <select id="filter-location" onchange="renderInventory()"> <option value="">جميع المواقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+       </div>
+       <div class="form-group" style="margin-bottom: 0;"><label for="filter-unit">رقم الشقة</label> <select id="filter-unit" onchange="renderInventory()"> <option value="">جميع الشقق</option> </select>
+       </div>
+       <div class="form-group" style="margin-bottom: 0;"><label for="filter-category">الفئة</label> <select id="filter-category" onchange="renderInventory()"> <option value="">جميع الفئات</option> <option value="Bedroom">🛏️ Bedroom</option> <option value="Bathroom">🚿 Bathroom</option> <option value="Kitchen">🍽️ Kitchen</option> <option value="Cleaning Supplies">🧼 Cleaning Supplies</option> <option value="Guest Essentials">✨ Guest Essentials</option> </select>
+       </div>
+       <div class="form-group" style="margin-bottom: 0;"><label>يحتاج تعبئة فقط</label>
+        <div class="checkbox-group"><input type="checkbox" id="filter-needs-refill" onchange="renderInventory()"> <label for="filter-needs-refill" style="margin: 0;">عرض النواقص فقط</label>
+        </div>
+       </div>
+      </div>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="inventory-table">
+        <thead>
+         <tr>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>الفئة</th>
+          <th>الصنف</th>
+          <th>الكمية الحالية</th>
+          <th>الحد الأدنى</th>
+          <th>يحتاج تعبئة</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="inventory-body"></tbody>
+       </table>
+      </div>
+     </div>
+    </div>
+   </main><!-- Modals --> <!-- Booking Modal -->
+   <div id="booking-modal" class="modal">
+    <div class="modal-content">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">حجز جديد</h2>
+     <form id="booking-form" onsubmit="saveBooking(event)">
+      <div class="form-group"><label for="booking-location">الموقع</label> <select id="booking-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="booking-unit">رقم الشقة</label> <input type="text" id="booking-unit" required>
+      </div>
+      <div class="form-group"><label for="booking-guest">اسم المستأجر</label> <input type="text" id="booking-guest" required>
+      </div>
+      <div class="form-group"><label for="booking-phone">رقم الهاتف</label> <input type="tel" id="booking-phone" required>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="booking-checkin-date">تاريخ الدخول</label> <input type="date" id="booking-checkin-date" required>
+       </div>
+       <div class="form-group"><label for="booking-checkin-time">وقت الدخول</label> <input type="time" id="booking-checkin-time" value="15:00" required>
+       </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="booking-checkout-date">تاريخ الخروج</label> <input type="date" id="booking-checkout-date" required>
+       </div>
+       <div class="form-group"><label for="booking-checkout-time">وقت الخروج</label> <input type="time" id="booking-checkout-time" value="11:00" required>
+       </div>
+      </div>
+      <div class="form-group"><label for="booking-guests">عدد الضيوف</label> <input type="number" id="booking-guests" min="1" value="1" required>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('booking-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Unit Modal -->
+   <div id="unit-modal" class="modal">
+    <div class="modal-content">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">شقة جديدة</h2>
+     <form id="unit-form" onsubmit="saveUnit(event)">
+      <div class="form-group"><label for="unit-location">الموقع</label> <select id="unit-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="unit-number">رقم الشقة</label> <input type="text" id="unit-number" required>
+      </div>
+      <div class="form-group"><label for="unit-type">نوع الشقة</label> <select id="unit-type" required> <option value="">اختر النوع</option> <option value="Studio">Studio</option> <option value="1BR">1BR</option> <option value="2BR">2BR</option> <option value="3BR">3BR</option> </select>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('unit-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Cleaning Modal -->
+   <div id="cleaning-modal" class="modal">
+    <div class="modal-content">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">مهمة تنظيف جديدة</h2>
+     <form id="cleaning-form" onsubmit="saveCleaning(event)">
+      <div class="form-group"><label for="cleaning-location">الموقع</label> <select id="cleaning-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="cleaning-unit">رقم الشقة</label> <input type="text" id="cleaning-unit" required>
+      </div>
+      <div class="form-group"><label for="cleaning-reason">سبب التنظيف</label> <select id="cleaning-reason" required> <option value="">اختر السبب</option> <option value="Check-out Cleaning">Check-out Cleaning</option> <option value="Stayover Cleaning">Stayover Cleaning</option> <option value="Deep Cleaning">Deep Cleaning</option> <option value="After Maintenance">After Maintenance</option> </select>
+      </div>
+      <div class="form-group"><label for="cleaning-date">التاريخ</label> <input type="date" id="cleaning-date" required>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="cleaning-start">وقت البدء</label> <input type="time" id="cleaning-start" required>
+       </div>
+       <div class="form-group"><label for="cleaning-end">وقت الانتهاء</label> <input type="time" id="cleaning-end">
+       </div>
+      </div>
+      <div class="form-group"><label for="cleaning-cleaner">المسؤول</label> <input type="text" id="cleaning-cleaner">
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('cleaning-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Inspection Modal -->
+   <div id="inspection-modal" class="modal">
+    <div class="modal-content">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">تفتيش جديد</h2>
+     <form id="inspection-form" onsubmit="saveInspection(event)">
+      <div class="form-group"><label for="inspection-location">الموقع</label> <select id="inspection-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="inspection-unit">رقم الشقة</label> <input type="text" id="inspection-unit" required>
+      </div>
+      <div class="form-group"><label for="inspection-date">التاريخ</label> <input type="date" id="inspection-date" required>
+      </div>
+      <div class="checkbox-group form-group"><input type="checkbox" id="inspection-wifi"> <label for="inspection-wifi" style="margin: 0;">Wi-Fi يعمل</label>
+      </div>
+      <div class="checkbox-group form-group"><input type="checkbox" id="inspection-clean"> <label for="inspection-clean" style="margin: 0;">النظافة ممتازة</label>
+      </div>
+      <div class="checkbox-group form-group"><input type="checkbox" id="inspection-supplies"> <label for="inspection-supplies" style="margin: 0;">المستلزمات كاملة</label>
+      </div>
+      <div class="form-group"><label for="inspection-notes">ملاحظات</label> <textarea id="inspection-notes" rows="3"></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('inspection-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Inventory Modal -->
+   <div id="inventory-modal" class="modal">
+    <div class="modal-content">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">صنف مخصص</h2>
+     <form id="inventory-form" onsubmit="saveInventory(event)">
+      <div class="form-group"><label for="inventory-location">الموقع</label> <select id="inventory-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="inventory-unit">رقم الشقة</label> <input type="text" id="inventory-unit" required>
+      </div>
+      <div class="form-group"><label for="inventory-category">الفئة</label> <select id="inventory-category" required> <option value="">اختر الفئة</option> <option value="Bedroom">🛏️ Bedroom</option> <option value="Bathroom">🚿 Bathroom</option> <option value="Kitchen">🍽️ Kitchen</option> <option value="Cleaning Supplies">🧼 Cleaning Supplies</option> <option value="Guest Essentials">✨ Guest Essentials</option> </select>
+      </div>
+      <div class="form-group"><label for="inventory-item">اسم الصنف</label> <input type="text" id="inventory-item" required>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="inventory-current">الكمية الحالية</label> <input type="number" id="inventory-current" min="0" value="0" required>
+       </div>
+       <div class="form-group"><label for="inventory-minimum">الحد الأدنى</label> <input type="number" id="inventory-minimum" min="0" value="1" required>
+       </div>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('inventory-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Setup Unit Modal -->
+   <div id="setup-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">⚡ إعداد شقة جديدة - المستلزمات القياسية</h2>
+     <form id="setup-form" onsubmit="setupUnitInventory(event)">
+      <div class="form-group"><label for="setup-location">الموقع</label> <select id="setup-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="setup-unit">رقم الشقة</label> <input type="text" id="setup-unit" required>
+      </div>
+      <div style="margin-top: 1.5rem; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+       <p style="font-weight: 600; margin-bottom: 1rem;">سيتم إضافة المستلزمات التالية تلقائياً:</p>
+       <div style="margin-bottom: 1rem;">
+        <h3 style="font-weight: bold; margin-bottom: 0.5rem;">🛏️ Bedroom (4 أصناف)</h3>
+        <ul style="margin: 0; padding-right: 1.5rem;">
+         <li>Bed Sheets Sets (2)</li>
+         <li>Pillows (4)</li>
+         <li>Extra Blanket (1)</li>
+         <li>Hangers (15)</li>
+        </ul>
+       </div>
+       <div style="margin-bottom: 1rem;">
+        <h3 style="font-weight: bold; margin-bottom: 0.5rem;">🚿 Bathroom (8 أصناف)</h3>
+        <ul style="margin: 0; padding-right: 1.5rem;">
+         <li>Bath Towels (4)</li>
+         <li>Hand Towels (4)</li>
+         <li>Bath Mat (2)</li>
+         <li>Shampoo Bottles (2)</li>
+         <li>Conditioner Bottles (2)</li>
+         <li>Hand Soap (2)</li>
+         <li>Hair Dryer (1)</li>
+         <li>Trash Bags Roll (1)</li>
+        </ul>
+       </div>
+       <div style="margin-bottom: 1rem;">
+        <h3 style="font-weight: bold; margin-bottom: 0.5rem;">🍽️ Kitchen (10 أصناف)</h3>
+        <ul style="margin: 0; padding-right: 1.5rem;">
+         <li>Dinner Plates (8)</li>
+         <li>Cups/Mugs (8)</li>
+         <li>Cutlery Set (8)</li>
+         <li>Cooking Pots (2)</li>
+         <li>Frying Pan (1)</li>
+         <li>Electric Kettle (1)</li>
+         <li>Coffee Machine (1)</li>
+         <li>Coffee Packs (3)</li>
+         <li>Tea Bags Box (1)</li>
+         <li>Sugar Pack (1)</li>
+        </ul>
+       </div>
+       <div style="margin-bottom: 1rem;">
+        <h3 style="font-weight: bold; margin-bottom: 0.5rem;">🧼 Cleaning Supplies (6 أصناف)</h3>
+        <ul style="margin: 0; padding-right: 1.5rem;">
+         <li>Floor Cleaner Bottle (1)</li>
+         <li>Disinfectant Spray (1)</li>
+         <li>Mop (1)</li>
+         <li>Broom (1)</li>
+         <li>Sponges Pack (1)</li>
+         <li>Cleaning Gloves (2 pairs)</li>
+        </ul>
+       </div>
+       <div style="margin-bottom: 0;">
+        <h3 style="font-weight: bold; margin-bottom: 0.5rem;">✨ Guest Essentials (3 أصناف)</h3>
+        <ul style="margin: 0; padding-right: 1.5rem;">
+         <li>Toilet Paper Rolls (6)</li>
+         <li>Paper Towels Roll (2)</li>
+         <li>Tissues Box (2)</li>
+        </ul>
+       </div>
+       <div style="margin-top: 1rem; padding: 0.75rem; background: #dbeafe; border-radius: 6px; color: #1e40af;"><strong>الإجمالي: 33 صنف</strong>
+       </div>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-success" style="flex: 1;">⚡ إعداد الشقة</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('setup-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Update Quantity Modal -->
+   <div id="update-quantity-modal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">تحديث الكمية</h2>
+     <div id="update-item-info" style="margin-bottom: 1rem; padding: 1rem; background: #f9fafb; border-radius: 8px;"></div>
+     <form id="update-quantity-form" onsubmit="saveQuantityUpdate(event)">
+      <div class="form-group"><label for="new-quantity">الكمية الجديدة</label> <input type="number" id="new-quantity" min="0" required>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('update-quantity-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div>
+  </div>
+  <script>
+    let allData = [];
+    
+    const defaultConfig = {
+      system_title: "نظام تشغيل الشقق",
+      default_checkin_time: "3:00 PM",
+      default_checkout_time: "11:00 AM",
+      background_color: "#f3f4f6",
+      surface_color: "#ffffff",
+      text_color: "#1f2937",
+      primary_action_color: "#3b82f6",
+      secondary_action_color: "#6b7280"
+    };
+    
+    const dataHandler = {
+      onDataChanged(data) {
+        allData = data;
+        updateDashboard();
+        renderActiveTab();
+      }
+    };
+    
+    async function init() {
+      const initResult = await window.dataSdk.init(dataHandler);
+      if (!initResult.isOk) {
+        showToast("فشل تحميل النظام");
+        return;
+      }
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            const systemTitle = document.getElementById('system-title');
+            if (systemTitle) {
+              systemTitle.textContent = config.system_title || defaultConfig.system_title;
+            }
+            
+            const background = config.background_color || defaultConfig.background_color;
+            const surface = config.surface_color || defaultConfig.surface_color;
+            const text = config.text_color || defaultConfig.text_color;
+            const primary = config.primary_action_color || defaultConfig.primary_action_color;
+            const secondary = config.secondary_action_color || defaultConfig.secondary_action_color;
+            
+            document.getElementById('app').style.background = background;
+            
+            const cards = document.querySelectorAll('.card, .stat-card, .modal-content');
+            cards.forEach(card => card.style.background = surface);
+            
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => table.style.background = surface);
+            
+            document.body.style.color = text;
+            
+            const primaryButtons = document.querySelectorAll('.btn-primary');
+            primaryButtons.forEach(btn => btn.style.background = primary);
+            
+            const secondaryButtons = document.querySelectorAll('.btn-secondary');
+            secondaryButtons.forEach(btn => btn.style.background = secondary);
+            
+            const activeTabs = document.querySelectorAll('.tab-button.active');
+            activeTabs.forEach(tab => {
+              tab.style.color = primary;
+              tab.style.borderBottomColor = primary;
+            });
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  config.surface_color = value;
+                  window.elementSdk.setConfig({ surface_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              },
+              {
+                get: () => config.primary_action_color || defaultConfig.primary_action_color,
+                set: (value) => {
+                  config.primary_action_color = value;
+                  window.elementSdk.setConfig({ primary_action_color: value });
+                }
+              },
+              {
+                get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+                set: (value) => {
+                  config.secondary_action_color = value;
+                  window.elementSdk.setConfig({ secondary_action_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: undefined,
+            fontSizeable: undefined
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ["system_title", config.system_title || defaultConfig.system_title],
+            ["default_checkin_time", config.default_checkin_time || defaultConfig.default_checkin_time],
+            ["default_checkout_time", config.default_checkout_time || defaultConfig.default_checkout_time]
+          ])
+        });
+      }
+      
+      setupTabs();
+      updateDashboard();
+    }
+    
+    function setupTabs() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          tabButtons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.color = '#6b7280';
+            btn.style.borderBottomColor = 'transparent';
+          });
+          
+          button.classList.add('active');
+          button.style.color = '#3b82f6';
+          button.style.borderBottomColor = '#3b82f6';
+          
+          const tabContents = document.querySelectorAll('.tab-content');
+          tabContents.forEach(content => content.style.display = 'none');
+          
+          const tabId = button.dataset.tab + '-tab';
+          const activeTab = document.getElementById(tabId);
+          if (activeTab) {
+            activeTab.style.display = 'block';
+            renderActiveTab();
+          }
+        });
+      });
+    }
+    
+    function renderActiveTab() {
+      const activeTab = document.querySelector('.tab-button.active');
+      if (!activeTab) return;
+      
+      const tab = activeTab.dataset.tab;
+      
+      switch(tab) {
+        case 'dashboard':
+          updateDashboard();
+          break;
+        case 'bookings':
+          renderBookings();
+          break;
+        case 'units':
+          renderUnits();
+          break;
+        case 'cleaning':
+          renderCleaning();
+          break;
+        case 'inspection':
+          renderInspection();
+          break;
+        case 'inventory':
+          renderInventory();
+          break;
+      }
+    }
+    
+    function updateDashboard() {
+      const units = allData.filter(d => d.type === 'unit');
+      const bookings = allData.filter(d => d.type === 'booking');
+      const cleaning = allData.filter(d => d.type === 'cleaning');
+      const inventory = allData.filter(d => d.type === 'inventory');
+      
+      const readyUnits = units.filter(u => u.unit_status === 'Ready').length;
+      const needsCleaning = units.filter(u => u.unit_status === 'Needs Cleaning').length;
+      
+      const today = new Date().toISOString().split('T')[0];
+      const checkinsToday = bookings.filter(b => b.checkin_date === today).length;
+      const checkoutsToday = bookings.filter(b => b.checkout_date === today).length;
+      
+      const pendingTasks = cleaning.filter(c => c.cleaning_status === 'Pending' || c.cleaning_status === 'In Progress').length;
+      
+      document.getElementById('ready-count').textContent = readyUnits;
+      document.getElementById('cleaning-count').textContent = needsCleaning;
+      document.getElementById('checkin-count').textContent = checkinsToday;
+      document.getElementById('checkout-count').textContent = checkoutsToday;
+      document.getElementById('tasks-count').textContent = pendingTasks;
+      
+      const todayBookings = bookings.filter(b => b.checkin_date === today || b.checkout_date === today);
+      const todayBookingsDiv = document.getElementById('today-bookings');
+      if (todayBookings.length === 0) {
+        todayBookingsDiv.innerHTML = '<p style="color: #6b7280;">لا توجد حجوزات لليوم</p>';
+      } else {
+        todayBookingsDiv.innerHTML = todayBookings.map(b => `
+          <div style="padding: 1rem; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>${b.guest_name}</strong> - ${b.location} ${b.unit_number}
+              </div>
+              <div>
+                ${b.checkin_date === today ? '⬅️ دخول' : '➡️ خروج'}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      const lowInventory = inventory.filter(i => i.needs_refill);
+      const lowInventoryDiv = document.getElementById('low-inventory');
+      if (lowInventory.length === 0) {
+        lowInventoryDiv.innerHTML = '<p style="color: #6b7280;">جميع المستلزمات متوفرة</p>';
+      } else {
+        lowInventoryDiv.innerHTML = lowInventory.map(i => `
+          <div style="padding: 1rem; border: 2px solid #fbbf24; border-radius: 8px; margin-bottom: 0.5rem; background: #fef3c7;">
+            <strong>${i.item_name}</strong> - ${i.location} ${i.unit_number}<br>
+            <span style="color: #92400e;">الكمية: ${i.current_quantity} / الحد الأدنى: ${i.minimum_quantity}</span>
+          </div>
+        `).join('');
+      }
+    }
+    
+    function renderBookings() {
+      const bookings = allData.filter(d => d.type === 'booking');
+      const tbody = document.getElementById('bookings-body');
+      
+      if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #6b7280;">لا توجد حجوزات</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td>${b.location}</td>
+          <td>${b.unit_number}</td>
+          <td>${b.guest_name}</td>
+          <td>${b.guest_phone}</td>
+          <td>${b.checkin_date} ${b.checkin_time}</td>
+          <td>${b.checkout_date} ${b.checkout_time}</td>
+          <td>${b.guest_count}</td>
+          <td>${getBookingStatusBadge(b.booking_status)}</td>
+          <td>
+            <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteBooking('${b.__backendId}')">حذف</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderUnits() {
+      const units = allData.filter(d => d.type === 'unit');
+      const tbody = document.getElementById('units-body');
+      
+      if (units.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280;">لا توجد شقق</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = units.map(u => `
+        <tr>
+          <td>${u.location}</td>
+          <td>${u.unit_number}</td>
+          <td>${u.unit_type}</td>
+          <td>${getUnitStatusBadge(u.unit_status)}</td>
+          <td>${u.last_cleaning || '-'}</td>
+          <td>${u.unit_status === 'Ready' ? '✅' : '❌'}</td>
+          <td>
+            <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteUnit('${u.__backendId}')">حذف</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderCleaning() {
+      const cleaning = allData.filter(d => d.type === 'cleaning');
+      const tbody = document.getElementById('cleaning-body');
+      
+      if (cleaning.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #6b7280;">لا توجد مهام تنظيف</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = cleaning.map(c => `
+        <tr>
+          <td>${c.location}</td>
+          <td>${c.unit_number}</td>
+          <td>${c.cleaning_reason}</td>
+          <td>${c.cleaning_date}</td>
+          <td>${c.start_time}</td>
+          <td>${c.end_time || '-'}</td>
+          <td>${c.cleaner_name || '-'}</td>
+          <td>${getCleaningStatusBadge(c.cleaning_status)}</td>
+          <td>
+            <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteCleaning('${c.__backendId}')">حذف</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderInspection() {
+      const inspections = allData.filter(d => d.type === 'inspection');
+      const tbody = document.getElementById('inspection-body');
+      
+      if (inspections.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #6b7280;">لا توجد تفتيشات</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = inspections.map(i => `
+        <tr>
+          <td>${i.location}</td>
+          <td>${i.unit_number}</td>
+          <td>${i.inspection_date}</td>
+          <td>${i.wifi_ok ? '✅' : '❌'}</td>
+          <td>${i.cleanliness_ok ? '✅' : '❌'}</td>
+          <td>${i.supplies_ok ? '✅' : '❌'}</td>
+          <td>${i.inspection_notes || '-'}</td>
+          <td>${i.approved ? '✅' : '❌'}</td>
+          <td>
+            <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteInspection('${i.__backendId}')">حذف</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderInventory() {
+      let inventory = allData.filter(d => d.type === 'inventory');
+      
+      const locationFilter = document.getElementById('filter-location').value;
+      const unitFilter = document.getElementById('filter-unit').value;
+      const categoryFilter = document.getElementById('filter-category').value;
+      const needsRefillOnly = document.getElementById('filter-needs-refill').checked;
+      
+      if (locationFilter) {
+        inventory = inventory.filter(i => i.location === locationFilter);
+      }
+      if (unitFilter) {
+        inventory = inventory.filter(i => i.unit_number === unitFilter);
+      }
+      if (categoryFilter) {
+        inventory = inventory.filter(i => i.category === categoryFilter);
+      }
+      if (needsRefillOnly) {
+        inventory = inventory.filter(i => i.needs_refill);
+      }
+      
+      updateFilterUnits();
+      
+      const tbody = document.getElementById('inventory-body');
+      
+      if (inventory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #6b7280;">لا توجد أصناف</td></tr>';
+        return;
+      }
+      
+      inventory.sort((a, b) => {
+        if (a.location !== b.location) return a.location.localeCompare(b.location);
+        if (a.unit_number !== b.unit_number) return a.unit_number.localeCompare(b.unit_number);
+        return a.category.localeCompare(b.category);
+      });
+      
+      tbody.innerHTML = inventory.map(i => {
+        const statusColor = i.needs_refill ? '#fbbf24' : '#10b981';
+        const statusBg = i.needs_refill ? '#fef3c7' : '#d1fae5';
+        const statusText = i.needs_refill ? 'يحتاج تعبئة' : 'متوفر';
+        const categoryIcon = getCategoryIcon(i.category);
+        
+        return `
+        <tr style="${i.needs_refill ? 'background: #fffbeb;' : ''}">
+          <td>${i.location}</td>
+          <td>${i.unit_number}</td>
+          <td>${categoryIcon} ${i.category}</td>
+          <td><strong>${i.item_name}</strong></td>
+          <td><span style="font-size: 1.25rem; font-weight: bold; color: ${i.needs_refill ? '#dc2626' : '#059669'}">${i.current_quantity}</span></td>
+          <td><span style="color: #6b7280;">${i.minimum_quantity}</span></td>
+          <td><span class="status-badge" style="background: ${statusBg}; color: ${statusColor === '#fbbf24' ? '#92400e' : '#065f46'}">${statusText}</span></td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="openUpdateQuantity('${i.__backendId}')">تحديث</button>
+              <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteInventory('${i.__backendId}')">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `}).join('');
+    }
+    
+    function getCategoryIcon(category) {
+      const icons = {
+        'Bedroom': '🛏️',
+        'Bathroom': '🚿',
+        'Kitchen': '🍽️',
+        'Cleaning Supplies': '🧼',
+        'Guest Essentials': '✨'
+      };
+      return icons[category] || '📦';
+    }
+    
+    function updateFilterUnits() {
+      const locationFilter = document.getElementById('filter-location').value;
+      const unitFilter = document.getElementById('filter-unit');
+      
+      const inventory = allData.filter(d => d.type === 'inventory');
+      let filteredInventory = inventory;
+      
+      if (locationFilter) {
+        filteredInventory = inventory.filter(i => i.location === locationFilter);
+      }
+      
+      const uniqueUnits = [...new Set(filteredInventory.map(i => i.unit_number))].sort();
+      
+      const currentValue = unitFilter.value;
+      unitFilter.innerHTML = '<option value="">جميع الشقق</option>' + 
+        uniqueUnits.map(u => `<option value="${u}" ${u === currentValue ? 'selected' : ''}>${u}</option>`).join('');
+    }
+    
+    function getBookingStatusBadge(status) {
+      const colors = {
+        'Upcoming': 'background: #dbeafe; color: #1e40af',
+        'Checked-in': 'background: #d1fae5; color: #065f46',
+        'Checked-out': 'background: #fef3c7; color: #92400e',
+        'Cancelled': 'background: #fee2e2; color: #991b1b',
+        'Completed': 'background: #e5e7eb; color: #374151'
+      };
+      return `<span class="status-badge" style="${colors[status] || ''}">${status}</span>`;
+    }
+    
+    function getUnitStatusBadge(status) {
+      const colors = {
+        'Needs Cleaning': 'background: #fee2e2; color: #991b1b',
+        'Cleaning': 'background: #fef3c7; color: #92400e',
+        'Inspection': 'background: #dbeafe; color: #1e40af',
+        'Ready': 'background: #d1fae5; color: #065f46',
+        'Maintenance': 'background: #fce7f3; color: #831843'
+      };
+      return `<span class="status-badge" style="${colors[status] || ''}">${status}</span>`;
+    }
+    
+    function getCleaningStatusBadge(status) {
+      const colors = {
+        'Pending': 'background: #fef3c7; color: #92400e',
+        'In Progress': 'background: #dbeafe; color: #1e40af',
+        'Done': 'background: #d1fae5; color: #065f46',
+        'Approved': 'background: #e5e7eb; color: #374151'
+      };
+      return `<span class="status-badge" style="${colors[status] || ''}">${status}</span>`;
+    }
+    
+    function openBookingModal() {
+      document.getElementById('booking-modal').classList.add('active');
+    }
+    
+    function openUnitModal() {
+      document.getElementById('unit-modal').classList.add('active');
+    }
+    
+    function openCleaningModal() {
+      document.getElementById('cleaning-modal').classList.add('active');
+    }
+    
+    function openInspectionModal() {
+      document.getElementById('inspection-modal').classList.add('active');
+    }
+    
+    function openInventoryModal() {
+      document.getElementById('inventory-modal').classList.add('active');
+    }
+    
+    function openSetupModal() {
+      document.getElementById('setup-modal').classList.add('active');
+    }
+    
+    let currentUpdateItem = null;
+    
+    function openUpdateQuantity(itemId) {
+      const item = allData.find(d => d.__backendId === itemId);
+      if (!item) return;
+      
+      currentUpdateItem = item;
+      
+      const infoDiv = document.getElementById('update-item-info');
+      const categoryIcon = getCategoryIcon(item.category);
+      infoDiv.innerHTML = `
+        <div style="margin-bottom: 0.5rem;"><strong>الموقع:</strong> ${item.location}</div>
+        <div style="margin-bottom: 0.5rem;"><strong>الشقة:</strong> ${item.unit_number}</div>
+        <div style="margin-bottom: 0.5rem;"><strong>الفئة:</strong> ${categoryIcon} ${item.category}</div>
+        <div style="margin-bottom: 0.5rem;"><strong>الصنف:</strong> ${item.item_name}</div>
+        <div><strong>الكمية الحالية:</strong> <span style="font-size: 1.25rem; font-weight: bold; color: ${item.needs_refill ? '#dc2626' : '#059669'}">${item.current_quantity}</span></div>
+      `;
+      
+      document.getElementById('new-quantity').value = item.current_quantity;
+      document.getElementById('update-quantity-modal').classList.add('active');
+    }
+    
+    async function saveQuantityUpdate(event) {
+      event.preventDefault();
+      
+      if (!currentUpdateItem) return;
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري التحديث...';
+      
+      const newQuantity = parseInt(document.getElementById('new-quantity').value);
+      
+      currentUpdateItem.current_quantity = newQuantity;
+      currentUpdateItem.needs_refill = newQuantity < currentUpdateItem.minimum_quantity;
+      
+      const result = await window.dataSdk.update(currentUpdateItem);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast('تم تحديث الكمية بنجاح');
+        closeModal('update-quantity-modal');
+        currentUpdateItem = null;
+      } else {
+        showToast('فشل تحديث الكمية');
+      }
+    }
+    
+    async function setupUnitInventory(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الإعداد...';
+      
+      const location = document.getElementById('setup-location').value;
+      const unitNumber = document.getElementById('setup-unit').value;
+      
+      const standardItems = [
+        { category: 'Bedroom', item: 'Bed Sheets Sets', current: 2, min: 2 },
+        { category: 'Bedroom', item: 'Pillows', current: 4, min: 4 },
+        { category: 'Bedroom', item: 'Extra Blanket', current: 1, min: 1 },
+        { category: 'Bedroom', item: 'Hangers', current: 15, min: 10 },
+        
+        { category: 'Bathroom', item: 'Bath Towels', current: 4, min: 4 },
+        { category: 'Bathroom', item: 'Hand Towels', current: 4, min: 4 },
+        { category: 'Bathroom', item: 'Bath Mat', current: 2, min: 2 },
+        { category: 'Bathroom', item: 'Shampoo Bottles', current: 2, min: 2 },
+        { category: 'Bathroom', item: 'Conditioner Bottles', current: 2, min: 2 },
+        { category: 'Bathroom', item: 'Hand Soap', current: 2, min: 2 },
+        { category: 'Bathroom', item: 'Hair Dryer', current: 1, min: 1 },
+        { category: 'Bathroom', item: 'Trash Bags Roll', current: 1, min: 1 },
+        
+        { category: 'Kitchen', item: 'Dinner Plates', current: 8, min: 8 },
+        { category: 'Kitchen', item: 'Cups/Mugs', current: 8, min: 8 },
+        { category: 'Kitchen', item: 'Cutlery Set', current: 8, min: 8 },
+        { category: 'Kitchen', item: 'Cooking Pots', current: 2, min: 2 },
+        { category: 'Kitchen', item: 'Frying Pan', current: 1, min: 1 },
+        { category: 'Kitchen', item: 'Electric Kettle', current: 1, min: 1 },
+        { category: 'Kitchen', item: 'Coffee Machine', current: 1, min: 1 },
+        { category: 'Kitchen', item: 'Coffee Packs', current: 3, min: 2 },
+        { category: 'Kitchen', item: 'Tea Bags Box', current: 1, min: 1 },
+        { category: 'Kitchen', item: 'Sugar Pack', current: 1, min: 1 },
+        
+        { category: 'Cleaning Supplies', item: 'Floor Cleaner Bottle', current: 1, min: 1 },
+        { category: 'Cleaning Supplies', item: 'Disinfectant Spray', current: 1, min: 1 },
+        { category: 'Cleaning Supplies', item: 'Mop', current: 1, min: 1 },
+        { category: 'Cleaning Supplies', item: 'Broom', current: 1, min: 1 },
+        { category: 'Cleaning Supplies', item: 'Sponges Pack', current: 1, min: 1 },
+        { category: 'Cleaning Supplies', item: 'Cleaning Gloves', current: 2, min: 2 },
+        
+        { category: 'Guest Essentials', item: 'Toilet Paper Rolls', current: 6, min: 4 },
+        { category: 'Guest Essentials', item: 'Paper Towels Roll', current: 2, min: 2 },
+        { category: 'Guest Essentials', item: 'Tissues Box', current: 2, min: 2 }
+      ];
+      
+      const currentInventoryCount = allData.filter(d => d.type === 'inventory').length;
+      if (currentInventoryCount + standardItems.length > 999) {
+        showToast('لا يمكن إضافة جميع المستلزمات - الحد الأقصى 999 صنف');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '⚡ إعداد الشقة';
+        return;
+      }
+      
+      let successCount = 0;
+      for (const item of standardItems) {
+        const inventoryData = {
+          type: 'inventory',
+          location: location,
+          unit_number: unitNumber,
+          category: item.category,
+          item_name: item.item,
+          current_quantity: item.current,
+          minimum_quantity: item.min,
+          needs_refill: item.current < item.min,
+          timestamp: new Date().toISOString()
+        };
+        
+        const result = await window.dataSdk.create(inventoryData);
+        if (result.isOk) {
+          successCount++;
+        }
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = '⚡ إعداد الشقة';
+      
+      if (successCount === standardItems.length) {
+        showToast(`تم إعداد الشقة بنجاح! تم إضافة ${successCount} صنف`);
+        closeModal('setup-modal');
+        form.reset();
+      } else if (successCount > 0) {
+        showToast(`تم إضافة ${successCount} من ${standardItems.length} صنف`);
+      } else {
+        showToast('فشل إعداد الشقة');
+      }
+    }
+    
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+    
+    async function saveBooking(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'booking').length >= 999) {
+        showToast("تم الوصول للحد الأقصى من الحجوزات (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const bookingData = {
+        type: 'booking',
+        location: document.getElementById('booking-location').value,
+        unit_number: document.getElementById('booking-unit').value,
+        guest_name: document.getElementById('booking-guest').value,
+        guest_phone: document.getElementById('booking-phone').value,
+        checkin_date: document.getElementById('booking-checkin-date').value,
+        checkin_time: document.getElementById('booking-checkin-time').value,
+        checkout_date: document.getElementById('booking-checkout-date').value,
+        checkout_time: document.getElementById('booking-checkout-time').value,
+        guest_count: parseInt(document.getElementById('booking-guests').value),
+        booking_status: 'Upcoming',
+        timestamp: new Date().toISOString()
+      };
+      
+      const result = await window.dataSdk.create(bookingData);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast('تم إضافة الحجز بنجاح');
+        closeModal('booking-modal');
+        form.reset();
+      } else {
+        showToast('فشل حفظ الحجز');
+      }
+    }
+    
+    async function saveUnit(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'unit').length >= 999) {
+        showToast("تم الوصول للحد الأقصى من الشقق (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const unitData = {
+        type: 'unit',
+        location: document.getElementById('unit-location').value,
+        unit_number: document.getElementById('unit-number').value,
+        unit_type: document.getElementById('unit-type').value,
+        unit_status: 'Ready',
+        last_cleaning: new Date().toISOString().split('T')[0],
+        timestamp: new Date().toISOString()
+      };
+      
+      const result = await window.dataSdk.create(unitData);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast('تم إضافة الشقة بنجاح');
+        closeModal('unit-modal');
+        form.reset();
+      } else {
+        showToast('فشل حفظ الشقة');
+      }
+    }
+    
+    async function saveCleaning(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'cleaning').length >= 999) {
+        showToast("تم الوصول للحد الأقصى من مهام التنظيف (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const cleaningData = {
+        type: 'cleaning',
+        location: document.getElementById('cleaning-location').value,
+        unit_number: document.getElementById('cleaning-unit').value,
+        cleaning_reason: document.getElementById('cleaning-reason').value,
+        cleaning_date: document.getElementById('cleaning-date').value,
+        start_time: document.getElementById('cleaning-start').value,
+        end_time: document.getElementById('cleaning-end').value || null,
+        cleaner_name: document.getElementById('cleaning-cleaner').value || null,
+        cleaning_status: 'Pending',
+        timestamp: new Date().toISOString()
+      };
+      
+      const result = await window.dataSdk.create(cleaningData);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast('تم إضافة مهمة التنظيف بنجاح');
+        closeModal('cleaning-modal');
+        form.reset();
+      } else {
+        showToast('فشل حفظ مهمة التنظيف');
+      }
+    }
+    
+    async function saveInspection(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'inspection').length >= 999) {
+        showToast("تم الوصول للحد الأقصى من التفتيشات (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const wifiOk = document.getElementById('inspection-wifi').checked;
+      const cleanOk = document.getElementById('inspection-clean').checked;
+      const suppliesOk = document.getElementById('inspection-supplies').checked;
+      
+      const inspectionData = {
+        type: 'inspection',
+        location: document.getElementById('inspection-location').value,
+        unit_number: document.getElementById('inspection-unit').value,
+        inspection_date: document.getElementById('inspection-date').value,
+        wifi_ok: wifiOk,
+        cleanliness_ok: cleanOk,
+        supplies_ok: suppliesOk,
+        inspection_notes: document.getElementById('inspection-notes').value || null,
+        approved: wifiOk && cleanOk && suppliesOk,
+        timestamp: new Date().toISOString()
+      };
+      
+      const result = await window.dataSdk.create(inspectionData);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast('تم إضافة التفتيش بنجاح');
+        closeModal('inspection-modal');
+        form.reset();
+      } else {
+        showToast('فشل حفظ التفتيش');
+      }
+    }
+    
+    async function saveInventory(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'inventory').length >= 999) {
+        showToast("تم الوصول للحد الأقصى من الأصناف (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const current = parseInt(document.getElementById('inventory-current').value);
+      const minimum = parseInt(document.getElementById('inventory-minimum').value);
+      
+      const inventoryData = {
+        type: 'inventory',
+        location: document.getElementById('inventory-location').value,
+        unit_number: document.getElementById('inventory-unit').value,
+        category: document.getElementById('inventory-category').value,
+        item_name: document.getElementById('inventory-item').value,
+        current_quantity: current,
+        minimum_quantity: minimum,
+        needs_refill: current < minimum,
+        timestamp: new Date().toISOString()
+      };
+      
+      const result = await window.dataSdk.create(inventoryData);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast('تم إضافة الصنف بنجاح');
+        closeModal('inventory-modal');
+        form.reset();
+      } else {
+        showToast('فشل حفظ الصنف');
+      }
+    }
+    
+    async function deleteBooking(id) {
+      const booking = allData.find(d => d.__backendId === id);
+      if (!booking) return;
+      
+      const result = await window.dataSdk.delete(booking);
+      
+      if (result.isOk) {
+        showToast('تم حذف الحجز');
+      } else {
+        showToast('فشل حذف الحجز');
+      }
+    }
+    
+    async function deleteUnit(id) {
+      const unit = allData.find(d => d.__backendId === id);
+      if (!unit) return;
+      
+      const result = await window.dataSdk.delete(unit);
+      
+      if (result.isOk) {
+        showToast('تم حذف الشقة');
+      } else {
+        showToast('فشل حذف الشقة');
+      }
+    }
+    
+    async function deleteCleaning(id) {
+      const cleaning = allData.find(d => d.__backendId === id);
+      if (!cleaning) return;
+      
+      const result = await window.dataSdk.delete(cleaning);
+      
+      if (result.isOk) {
+        showToast('تم حذف مهمة التنظيف');
+      } else {
+        showToast('فشل حذف مهمة التنظيف');
+      }
+    }
+    
+    async function deleteInspection(id) {
+      const inspection = allData.find(d => d.__backendId === id);
+      if (!inspection) return;
+      
+      const result = await window.dataSdk.delete(inspection);
+      
+      if (result.isOk) {
+        showToast('تم حذف التفتيش');
+      } else {
+        showToast('فشل حذف التفتيش');
+      }
+    }
+    
+    async function deleteInventory(id) {
+      const inventory = allData.find(d => d.__backendId === id);
+      if (!inventory) return;
+      
+      const result = await window.dataSdk.delete(inventory);
+      
+      if (result.isOk) {
+        showToast('تم حذف الصنف');
+      } else {
+        showToast('فشل حذف الصنف');
+      }
+    }
+    
+    function showToast(message) {
+      const existingToast = document.querySelector('.toast');
+      if (existingToast) {
+        existingToast.remove();
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+    
+    init();
+  </script>
+ </body>
+</html>
+
