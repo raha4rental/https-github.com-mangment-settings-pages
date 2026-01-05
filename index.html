@@ -239,7 +239,7 @@
     <p style="opacity: 0.8; margin-top: 0.25rem;">إدارة متكاملة للمواقع الخمسة</p>
    </header><!-- Navigation Tabs -->
    <nav style="background: white; padding: 0 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <div style="display: flex; gap: 1rem;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button>
+    <div style="display: flex; gap: 1rem;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button>
     </div>
    </nav><!-- Main Content -->
    <main style="padding: 2rem; max-width: 1400px; margin: 0 auto;"><!-- Dashboard Tab -->
@@ -311,6 +311,7 @@
           <th>تاريخ الدخول</th>
           <th>تاريخ الخروج</th>
           <th>الضيوف</th>
+          <th>العنوان</th>
           <th>الحالة</th>
           <th>إجراءات</th>
          </tr>
@@ -392,6 +393,33 @@
        </table>
       </div>
      </div>
+    </div><!-- Delivery Tab -->
+    <div id="delivery-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة التوصيل</h2><button class="btn-primary" onclick="openDeliveryModal()">+ طلب توصيل جديد</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="delivery-table">
+        <thead>
+         <tr>
+          <th>الاسم</th>
+          <th>رقم الجوال</th>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>العنوان</th>
+          <th>تاريخ الحجز</th>
+          <th>وقت الدخول</th>
+          <th>وقت الخروج</th>
+          <th>حالة التوصيل</th>
+          <th>ملاحظات</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="delivery-body"></tbody>
+       </table>
+      </div>
+     </div>
     </div><!-- Inventory Tab -->
     <div id="inventory-tab" class="tab-content" style="display: none;">
      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -446,6 +474,8 @@
       <div class="form-group"><label for="booking-guest">اسم المستأجر</label> <input type="text" id="booking-guest" required>
       </div>
       <div class="form-group"><label for="booking-phone">رقم الهاتف</label> <input type="tel" id="booking-phone" required>
+      </div>
+      <div class="form-group"><label for="booking-address">العنوان (اختياري)</label> <textarea id="booking-address" rows="2" placeholder="عنوان التوصيل إذا كان مطلوب"></textarea>
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
        <div class="form-group"><label for="booking-checkin-date">تاريخ الدخول</label> <input type="date" id="booking-checkin-date" required>
@@ -622,6 +652,43 @@
        </div>
       </div>
       <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-success" style="flex: 1;">⚡ إعداد الشقة</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('setup-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Delivery Modal -->
+   <div id="delivery-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">طلب توصيل جديد</h2>
+     <form id="delivery-form" onsubmit="saveDelivery(event)">
+      <div class="form-group"><label for="delivery-booking">ربط بحجز موجود (اختياري)</label> <select id="delivery-booking" onchange="fillDeliveryFromBooking()"> <option value="">اختر حجز (أو اتركه فارغاً لإضافة جديد)</option> </select>
+      </div>
+      <div class="form-group"><label for="delivery-name">اسم العميل</label> <input type="text" id="delivery-name" required>
+      </div>
+      <div class="form-group"><label for="delivery-phone">رقم الجوال</label> <input type="tel" id="delivery-phone" required>
+      </div>
+      <div class="form-group"><label for="delivery-location">الموقع</label> <select id="delivery-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      </div>
+      <div class="form-group"><label for="delivery-unit">رقم الشقة</label> <input type="text" id="delivery-unit" required>
+      </div>
+      <div class="form-group"><label for="delivery-address">عنوان التوصيل</label> <textarea id="delivery-address" rows="3" required placeholder="العنوان الكامل للتوصيل"></textarea>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="delivery-checkin-date">تاريخ الحجز (دخول)</label> <input type="date" id="delivery-checkin-date" required>
+       </div>
+       <div class="form-group"><label for="delivery-checkin-time">وقت الدخول</label> <input type="time" id="delivery-checkin-time" value="15:00" required>
+       </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="delivery-checkout-date">تاريخ الخروج</label> <input type="date" id="delivery-checkout-date" required>
+       </div>
+       <div class="form-group"><label for="delivery-checkout-time">وقت الخروج</label> <input type="time" id="delivery-checkout-time" value="11:00" required>
+       </div>
+      </div>
+      <div class="form-group"><label for="delivery-status">حالة التوصيل</label> <select id="delivery-status" required> <option value="Pending">⏳ قيد الانتظار</option> <option value="Scheduled">📅 مجدول</option> <option value="In Transit">🚚 قيد التوصيل</option> <option value="Delivered">✅ تم التوصيل</option> <option value="Cancelled">❌ ملغي</option> </select>
+      </div>
+      <div class="form-group"><label for="delivery-notes">ملاحظات التوصيل</label> <textarea id="delivery-notes" rows="3" placeholder="ملاحظات إضافية عن التوصيل"></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('delivery-modal')">إلغاء</button>
       </div>
      </form>
     </div>
@@ -811,6 +878,9 @@
         case 'inventory':
           renderInventory();
           break;
+        case 'delivery':
+          renderDelivery();
+          break;
       }
     }
     
@@ -873,7 +943,7 @@
       const tbody = document.getElementById('bookings-body');
       
       if (bookings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #6b7280;">لا توجد حجوزات</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #6b7280;">لا توجد حجوزات</td></tr>';
         return;
       }
       
@@ -886,6 +956,7 @@
           <td>${b.checkin_date} ${b.checkin_time}</td>
           <td>${b.checkout_date} ${b.checkout_time}</td>
           <td>${b.guest_count}</td>
+          <td style="max-width: 200px; word-wrap: break-word;">${b.guest_address || '-'}</td>
           <td>${getBookingStatusBadge(b.booking_status)}</td>
           <td>
             <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteBooking('${b.__backendId}')">حذف</button>
@@ -1281,6 +1352,7 @@
         unit_number: document.getElementById('booking-unit').value,
         guest_name: document.getElementById('booking-guest').value,
         guest_phone: document.getElementById('booking-phone').value,
+        guest_address: document.getElementById('booking-address').value || null,
         checkin_date: document.getElementById('booking-checkin-date').value,
         checkin_time: document.getElementById('booking-checkin-time').value,
         checkout_date: document.getElementById('booking-checkout-date').value,
@@ -1529,6 +1601,188 @@
         showToast('تم حذف الصنف');
       } else {
         showToast('فشل حذف الصنف');
+      }
+    }
+    
+    function renderDelivery() {
+      const deliveries = allData.filter(d => d.type === 'delivery');
+      const tbody = document.getElementById('delivery-body');
+      
+      if (deliveries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #6b7280;">لا توجد طلبات توصيل</td></tr>';
+        return;
+      }
+      
+      deliveries.sort((a, b) => {
+        if (a.delivery_status === 'Pending' && b.delivery_status !== 'Pending') return -1;
+        if (a.delivery_status !== 'Pending' && b.delivery_status === 'Pending') return 1;
+        return new Date(b.timestamp) - new Date(a.timestamp);
+      });
+      
+      tbody.innerHTML = deliveries.map(d => `
+        <tr>
+          <td><strong>${d.customer_name}</strong></td>
+          <td>${d.customer_phone}</td>
+          <td>${d.location}</td>
+          <td>${d.unit_number}</td>
+          <td style="max-width: 200px; word-wrap: break-word;">${d.delivery_address || '-'}</td>
+          <td>${d.checkin_date}</td>
+          <td>${d.checkin_time}</td>
+          <td>${d.checkout_date} ${d.checkout_time}</td>
+          <td>${getDeliveryStatusBadge(d.delivery_status)}</td>
+          <td style="max-width: 150px; word-wrap: break-word;">${d.delivery_notes || '-'}</td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="editDelivery('${d.__backendId}')">تعديل</button>
+              <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteDelivery('${d.__backendId}')">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      
+      updateDeliveryBookingOptions();
+    }
+    
+    function getDeliveryStatusBadge(status) {
+      const colors = {
+        'Pending': 'background: #fef3c7; color: #92400e',
+        'Scheduled': 'background: #dbeafe; color: #1e40af',
+        'In Transit': 'background: #fce7f3; color: #831843',
+        'Delivered': 'background: #d1fae5; color: #065f46',
+        'Cancelled': 'background: #fee2e2; color: #991b1b'
+      };
+      const labels = {
+        'Pending': '⏳ قيد الانتظار',
+        'Scheduled': '📅 مجدول',
+        'In Transit': '🚚 قيد التوصيل',
+        'Delivered': '✅ تم التوصيل',
+        'Cancelled': '❌ ملغي'
+      };
+      return `<span class="status-badge" style="${colors[status] || ''}">${labels[status] || status}</span>`;
+    }
+    
+    function updateDeliveryBookingOptions() {
+      const bookingSelect = document.getElementById('delivery-booking');
+      if (!bookingSelect) return;
+      
+      const bookings = allData.filter(d => d.type === 'booking');
+      bookingSelect.innerHTML = '<option value="">اختر حجز (أو اتركه فارغاً لإضافة جديد)</option>' + 
+        bookings.map(b => `<option value="${b.__backendId}">${b.guest_name} - ${b.location} ${b.unit_number} (${b.checkin_date})</option>`).join('');
+    }
+    
+    function fillDeliveryFromBooking() {
+      const bookingId = document.getElementById('delivery-booking').value;
+      if (!bookingId) return;
+      
+      const booking = allData.find(d => d.__backendId === bookingId);
+      if (!booking) return;
+      
+      document.getElementById('delivery-name').value = booking.guest_name || '';
+      document.getElementById('delivery-phone').value = booking.guest_phone || '';
+      document.getElementById('delivery-location').value = booking.location || '';
+      document.getElementById('delivery-unit').value = booking.unit_number || '';
+      document.getElementById('delivery-address').value = booking.guest_address || '';
+      document.getElementById('delivery-checkin-date').value = booking.checkin_date || '';
+      document.getElementById('delivery-checkin-time').value = booking.checkin_time || '';
+      document.getElementById('delivery-checkout-date').value = booking.checkout_date || '';
+      document.getElementById('delivery-checkout-time').value = booking.checkout_time || '';
+    }
+    
+    function openDeliveryModal() {
+      updateDeliveryBookingOptions();
+      document.getElementById('delivery-form').reset();
+      document.getElementById('delivery-booking').value = '';
+      document.getElementById('delivery-modal').classList.add('active');
+    }
+    
+    let currentEditDelivery = null;
+    
+    function editDelivery(id) {
+      const delivery = allData.find(d => d.__backendId === id);
+      if (!delivery) return;
+      
+      currentEditDelivery = delivery;
+      updateDeliveryBookingOptions();
+      
+      document.getElementById('delivery-name').value = delivery.customer_name || '';
+      document.getElementById('delivery-phone').value = delivery.customer_phone || '';
+      document.getElementById('delivery-location').value = delivery.location || '';
+      document.getElementById('delivery-unit').value = delivery.unit_number || '';
+      document.getElementById('delivery-address').value = delivery.delivery_address || '';
+      document.getElementById('delivery-checkin-date').value = delivery.checkin_date || '';
+      document.getElementById('delivery-checkin-time').value = delivery.checkin_time || '';
+      document.getElementById('delivery-checkout-date').value = delivery.checkout_date || '';
+      document.getElementById('delivery-checkout-time').value = delivery.checkout_time || '';
+      document.getElementById('delivery-status').value = delivery.delivery_status || 'Pending';
+      document.getElementById('delivery-notes').value = delivery.delivery_notes || '';
+      document.getElementById('delivery-booking').value = '';
+      
+      document.getElementById('delivery-modal').classList.add('active');
+    }
+    
+    async function saveDelivery(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'delivery').length >= 999 && !currentEditDelivery) {
+        showToast("تم الوصول للحد الأقصى من طلبات التوصيل (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const deliveryData = {
+        type: 'delivery',
+        customer_name: document.getElementById('delivery-name').value,
+        customer_phone: document.getElementById('delivery-phone').value,
+        location: document.getElementById('delivery-location').value,
+        unit_number: document.getElementById('delivery-unit').value,
+        delivery_address: document.getElementById('delivery-address').value,
+        checkin_date: document.getElementById('delivery-checkin-date').value,
+        checkin_time: document.getElementById('delivery-checkin-time').value,
+        checkout_date: document.getElementById('delivery-checkout-date').value,
+        checkout_time: document.getElementById('delivery-checkout-time').value,
+        delivery_status: document.getElementById('delivery-status').value,
+        delivery_notes: document.getElementById('delivery-notes').value || null,
+        booking_id: document.getElementById('delivery-booking').value || null,
+        timestamp: new Date().toISOString()
+      };
+      
+      let result;
+      if (currentEditDelivery) {
+        deliveryData.__backendId = currentEditDelivery.__backendId;
+        result = await window.dataSdk.update(deliveryData);
+      } else {
+        result = await window.dataSdk.create(deliveryData);
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast(currentEditDelivery ? 'تم تحديث طلب التوصيل بنجاح' : 'تم إضافة طلب التوصيل بنجاح');
+        closeModal('delivery-modal');
+        form.reset();
+        currentEditDelivery = null;
+      } else {
+        showToast('فشل حفظ طلب التوصيل');
+      }
+    }
+    
+    async function deleteDelivery(id) {
+      const delivery = allData.find(d => d.__backendId === id);
+      if (!delivery) return;
+      
+      if (!confirm('هل أنت متأكد من حذف طلب التوصيل؟')) return;
+      
+      const result = await window.dataSdk.delete(delivery);
+      
+      if (result.isOk) {
+        showToast('تم حذف طلب التوصيل');
+      } else {
+        showToast('فشل حذف طلب التوصيل');
       }
     }
     
