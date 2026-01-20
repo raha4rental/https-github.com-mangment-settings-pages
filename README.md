@@ -28,9 +28,9 @@ Open `index.html` directly in your browser.
 
 ### طريقة 2: استخدام خادم محلي
 ```bash
-python3 -m http.server 8000
+python3 -m http.server 8080
 ```
-Then open http://localhost:8000 in your browser.
+Then open http://localhost:8080 in your browser.
 
 ## المواقع المدعومة / Supported Locations
 

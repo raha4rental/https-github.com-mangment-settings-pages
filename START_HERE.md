@@ -56,10 +56,10 @@ git push -u origin main
 
 ```bash
 cd /Users/allaasheikh/mangment
-python3 -m http.server 8000
+python3 -m http.server 8080
 ```
 
-ثم افتح: `http://localhost:8000`
+ثم افتح: `http://localhost:8080`
 
 ---
 
