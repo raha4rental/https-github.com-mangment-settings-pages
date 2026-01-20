@@ -430,7 +430,7 @@
      <div class="card" style="margin-bottom: 1.5rem;">
       <h3 style="font-size: 1.125rem; font-weight: bold; margin-bottom: 1rem;">🔍 تصفية المستلزمات</h3>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-       <div class="form-group" style="margin-bottom: 0;"><label for="filter-location">الموقع</label> <select id="filter-location" onchange="renderInventory()"> <option value="">جميع المواقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+       <div class="form-group" style="margin-bottom: 0;"><label for="filter-location">الموقع</label> <select id="filter-location" onchange="renderInventory()"> <option value="">جميع المواقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
        </div>
        <div class="form-group" style="margin-bottom: 0;"><label for="filter-unit">رقم الشقة</label> <select id="filter-unit" onchange="renderInventory()"> <option value="">جميع الشقق</option> </select>
        </div>
@@ -467,7 +467,7 @@
     <div class="modal-content">
      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">حجز جديد</h2>
      <form id="booking-form" onsubmit="saveBooking(event)">
-      <div class="form-group"><label for="booking-location">الموقع</label> <select id="booking-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="booking-location">الموقع</label> <select id="booking-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="booking-unit">رقم الشقة</label> <input type="text" id="booking-unit" required>
       </div>
@@ -500,7 +500,7 @@
     <div class="modal-content">
      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">شقة جديدة</h2>
      <form id="unit-form" onsubmit="saveUnit(event)">
-      <div class="form-group"><label for="unit-location">الموقع</label> <select id="unit-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="unit-location">الموقع</label> <select id="unit-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="unit-number">رقم الشقة</label> <input type="text" id="unit-number" required>
       </div>
@@ -515,7 +515,7 @@
     <div class="modal-content">
      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">مهمة تنظيف جديدة</h2>
      <form id="cleaning-form" onsubmit="saveCleaning(event)">
-      <div class="form-group"><label for="cleaning-location">الموقع</label> <select id="cleaning-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="cleaning-location">الموقع</label> <select id="cleaning-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="cleaning-unit">رقم الشقة</label> <input type="text" id="cleaning-unit" required>
       </div>
@@ -540,7 +540,7 @@
     <div class="modal-content">
      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">تفتيش جديد</h2>
      <form id="inspection-form" onsubmit="saveInspection(event)">
-      <div class="form-group"><label for="inspection-location">الموقع</label> <select id="inspection-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="inspection-location">الموقع</label> <select id="inspection-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="inspection-unit">رقم الشقة</label> <input type="text" id="inspection-unit" required>
       </div>
@@ -563,7 +563,7 @@
     <div class="modal-content">
      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">صنف مخصص</h2>
      <form id="inventory-form" onsubmit="saveInventory(event)">
-      <div class="form-group"><label for="inventory-location">الموقع</label> <select id="inventory-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="inventory-location">الموقع</label> <select id="inventory-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="inventory-unit">رقم الشقة</label> <input type="text" id="inventory-unit" required>
       </div>
@@ -586,7 +586,7 @@
     <div class="modal-content" style="max-width: 800px;">
      <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">⚡ إعداد شقة جديدة - المستلزمات القياسية</h2>
      <form id="setup-form" onsubmit="setupUnitInventory(event)">
-      <div class="form-group"><label for="setup-location">الموقع</label> <select id="setup-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="setup-location">الموقع</label> <select id="setup-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="setup-unit">رقم الشقة</label> <input type="text" id="setup-unit" required>
       </div>
@@ -666,7 +666,7 @@
       </div>
       <div class="form-group"><label for="delivery-phone">رقم الجوال</label> <input type="tel" id="delivery-phone" required>
       </div>
-      <div class="form-group"><label for="delivery-location">الموقع</label> <select id="delivery-location" required> <option value="">اختر الموقع</option> <option value="Lamont">Lamont</option> <option value="Sky">Sky</option> <option value="Vantage – 1">Vantage – 1</option> <option value="Lumont">Lumont</option> <option value="Vantage – 2">Vantage – 2</option> </select>
+      <div class="form-group"><label for="delivery-location">الموقع</label> <select id="delivery-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
       </div>
       <div class="form-group"><label for="delivery-unit">رقم الشقة</label> <input type="text" id="delivery-unit" required>
       </div>
