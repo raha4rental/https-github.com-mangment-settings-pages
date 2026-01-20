@@ -1979,6 +1979,7 @@
       }
       
       // All properties from the spreadsheet - Total: 39 apartments (exactly as in spreadsheet)
+      // Verified count: Aster(5) + Lamont(5) + Lumos(1) + Sky(2) + Vantage(26) = 39
       const properties = [
         // Aster (5 apartments)
         { location: 'aster', unit_number: '150' },
@@ -2030,6 +2031,13 @@
         { location: 'vantage', unit_number: 'B4-402' }
       ];
       
+      // Verify count matches exactly 39
+      if (properties.length !== 39) {
+        console.error(`ERROR: Properties count is ${properties.length}, expected 39!`);
+        showToast(`خطأ: عدد العقارات ${properties.length} وليس 39`);
+        return;
+      }
+      
       // Check existing units to avoid duplicates
       const existingUnits = allData.filter(d => d.type === 'unit');
       const existingKeys = new Set(existingUnits.map(u => `${u.location}-${u.unit_number}`));
@@ -2051,7 +2059,17 @@
       }
       
       // Show progress
-      showToast(`جاري إضافة ${newProperties.length} شقة...`);
+      console.log('=== IMPORT APARTMENTS ===');
+      console.log('Total properties in list:', properties.length, '(should be 39)');
+      console.log('Existing apartments:', existingUnits.length);
+      console.log('New apartments to add:', newProperties.length);
+      
+      if (newProperties.length === 0) {
+        showToast(`جميع العقارات (${properties.length}) موجودة بالفعل في النظام. إجمالي العقارات: ${existingUnits.length}`);
+        return;
+      }
+      
+      showToast(`جاري إضافة ${newProperties.length} شقة... (المجموع بعد الإضافة: ${existingUnits.length + newProperties.length})`);
       console.log('Starting import of', newProperties.length, 'apartments');
       
       let successCount = 0;
