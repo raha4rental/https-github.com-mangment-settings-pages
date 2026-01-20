@@ -233,13 +233,37 @@
   <style>@view-transition { navigation: auto; }</style>
  </head>
  <body class="h-full">
-  <div id="app" class="h-full w-full" style="background: #f3f4f6; overflow-y: auto;"><!-- Header -->
-   <header style="background: #1f2937; color: white; padding: 1.5rem 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-    <h1 id="system-title" style="font-size: 1.875rem; font-weight: bold; margin: 0;">نظام تشغيل الشقق</h1>
-    <p style="opacity: 0.8; margin-top: 0.25rem;">إدارة متكاملة للمواقع الخمسة</p>
+  <!-- Login Screen -->
+  <div id="login-screen" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+   <div style="background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 90%;">
+    <h2 style="font-size: 2rem; font-weight: bold; text-align: center; margin-bottom: 0.5rem; color: #1f2937;">نظام تشغيل الشقق</h2>
+    <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">تسجيل الدخول</p>
+    <form id="login-form" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; gap: 1.5rem;">
+     <div class="form-group">
+      <label for="login-username" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">اسم المستخدم</label>
+      <input type="text" id="login-username" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s;" placeholder="أدخل اسم المستخدم">
+     </div>
+     <div class="form-group">
+      <label for="login-password" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #374151;">كلمة المرور</label>
+      <input type="password" id="login-password" required style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s;" placeholder="أدخل كلمة المرور">
+     </div>
+     <div id="login-error" style="display: none; padding: 0.75rem; background: #fee2e2; color: #991b1b; border-radius: 8px; text-align: center; font-size: 0.875rem;"></div>
+     <button type="submit" class="btn-primary" style="width: 100%; padding: 0.875rem; font-size: 1rem; font-weight: 600; cursor: pointer;">تسجيل الدخول</button>
+    </form>
+   </div>
+  </div>
+  
+  <!-- Main Application (Hidden until login) -->
+  <div id="app" class="h-full w-full" style="background: #f3f4f6; overflow-y: auto; display: none;"><!-- Header -->
+   <header style="background: #1f2937; color: white; padding: 1.5rem 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
+    <div>
+     <h1 id="system-title" style="font-size: 1.875rem; font-weight: bold; margin: 0;">نظام تشغيل الشقق</h1>
+     <p style="opacity: 0.8; margin-top: 0.25rem;">إدارة متكاملة للمواقع الخمسة</p>
+    </div>
+    <button onclick="handleLogout()" class="btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 0.875rem; cursor: pointer;">تسجيل الخروج</button>
    </header><!-- Navigation Tabs -->
    <nav style="background: white; padding: 0 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <div style="display: flex; gap: 1rem;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button> <button class="tab-button" data-tab="maintenance" style="color: #6b7280;"> الصيانة </button> <button class="tab-button" data-tab="invoices" style="color: #6b7280;"> الفواتير </button>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button> <button class="tab-button" data-tab="maintenance" style="color: #6b7280;"> الصيانة </button> <button class="tab-button" data-tab="invoices" style="color: #6b7280;"> الفواتير </button> <button class="tab-button" data-tab="pos" style="color: #6b7280;"> 💳 الدفعات </button>
     </div>
    </nav><!-- Main Content -->
    <main style="padding: 2rem; max-width: 1400px; margin: 0 auto;"><!-- Dashboard Tab -->
@@ -323,7 +347,14 @@
     </div><!-- Units Tab -->
     <div id="units-tab" class="tab-content" style="display: none;">
      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة الشقق</h2><button class="btn-primary" onclick="openUnitModal()">+ شقة جديدة</button>
+      <div>
+       <h2 style="font-size: 1.5rem; font-weight: bold; margin: 0;">إدارة الشقق</h2>
+       <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 1rem;">إجمالي الشقق: <strong id="total-units-count" style="color: #3b82f6; font-size: 1.125rem;">0</strong></p>
+      </div>
+      <div style="display: flex; gap: 1rem;">
+       <button class="btn-success" onclick="importAllProperties()">📥 استيراد جميع العقارات</button>
+       <button class="btn-primary" onclick="openUnitModal()">+ شقة جديدة</button>
+      </div>
      </div>
      <div class="card">
       <div class="table-container">
@@ -487,7 +518,34 @@
           <th>إجراءات</th>
          </tr>
         </thead>
-        <tbody id="maintenance-body"></tbody>
+        <tbody id="maintenance-body">        </tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- POS Tab -->
+    <div id="pos-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">💳 نظام الدفعات والإيجارات</h2><button class="btn-primary" onclick="openPOSModal()">+ دفعة جديدة</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="pos-table">
+        <thead>
+         <tr>
+          <th>تاريخ الدخول</th>
+          <th>عنوان الشقة</th>
+          <th>رقم الجوال</th>
+          <th>رأس المال</th>
+          <th>سعر المستأجر</th>
+          <th>الفواتير المخصومة</th>
+          <th>قيمة الربح</th>
+          <th>حالة الدفع</th>
+          <th>تاريخ الدفع</th>
+          <th>ملاحظات</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="pos-body"></tbody>
        </table>
       </div>
      </div>
@@ -824,9 +882,118 @@
       </div>
      </form>
     </div>
+   </div><!-- POS Modal -->
+   <div id="pos-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">💳 دفعة جديدة</h2>
+     <form id="pos-form" onsubmit="savePOS(event)">
+      <div class="form-group"><label for="pos-checkin-date">تاريخ الدخول</label> <input type="date" id="pos-checkin-date" required>
+      </div>
+      <div class="form-group"><label for="pos-location">الموقع</label> <select id="pos-location" required onchange="updatePOSUnits()"> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
+      </div>
+      <div class="form-group"><label for="pos-unit">اختر الشقة</label> <select id="pos-unit" required onchange="fillPOSFromUnit()"> <option value="">اختر الشقة أولاً</option> </select>
+      </div>
+      <div class="form-group"><label for="pos-address">عنوان الشقة</label> <textarea id="pos-address" rows="2" required placeholder="عنوان الشقة الكامل"></textarea>
+      </div>
+      <div class="form-group"><label for="pos-phone">رقم الجوال</label> <input type="tel" id="pos-phone" required placeholder="رقم الجوال">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+       <div class="form-group"><label for="pos-capital">رأس المال ($)</label> <input type="number" id="pos-capital" min="0" step="0.01" required placeholder="0.00" oninput="updatePOSProfit()">
+       </div>
+       <div class="form-group"><label for="pos-tenant-price">سعر المستأجر ($)</label> <input type="number" id="pos-tenant-price" min="0" step="0.01" required placeholder="0.00" oninput="updatePOSProfit()">
+       </div>
+      </div>
+      <div class="form-group"><label for="pos-invoices-deduction">الفواتير المخصومة ($)</label> <input type="number" id="pos-invoices-deduction" min="0" step="0.01" value="0" placeholder="0.00" oninput="updatePOSProfit()">
+      </div>
+      <div class="form-group"><label for="pos-profit" style="font-size: 1.125rem; font-weight: bold; color: #1f2937;">قيمة الربح ($)</label> <input type="text" id="pos-profit" readonly style="background: #f3f4f6; font-size: 1.25rem; font-weight: bold; color: #059669;" placeholder="0.00 $">
+      </div>
+      <div class="form-group"><label for="pos-paid">حالة الدفع</label> <select id="pos-paid" required onchange="updatePaymentDate()"> <option value="unpaid">❌ غير مدفوعة</option> <option value="paid">✅ مدفوعة</option> </select>
+      </div>
+      <div class="form-group" id="pos-payment-date-group" style="display: none;"><label for="pos-payment-date">تاريخ الدفع</label> <input type="date" id="pos-payment-date">
+      </div>
+      <div class="form-group"><label for="pos-notes">ملاحظات</label> <textarea id="pos-notes" rows="2" placeholder="ملاحظات إضافية"></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('pos-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
    </div>
   </div>
   <script>
+    // Authentication System
+    const ADMIN_CREDENTIALS = {
+      username: 'admin',
+      password: 'admin'
+    };
+    
+    // Check authentication status
+    function checkAuth() {
+      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+      if (isAuthenticated) {
+        showApp();
+      } else {
+        showLogin();
+      }
+    }
+    
+    // Show login screen
+    function showLogin() {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    }
+    
+    // Show main application
+    function showApp() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+    }
+    
+    // Handle login form submission
+    function handleLogin(event) {
+      event.preventDefault();
+      
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      const errorDiv = document.getElementById('login-error');
+      
+      // Debug: log the values (remove in production)
+      console.log('Username entered:', username);
+      console.log('Password entered:', password);
+      console.log('Expected username:', ADMIN_CREDENTIALS.username);
+      console.log('Expected password:', ADMIN_CREDENTIALS.password);
+      
+      if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+        // Login successful
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('loginTime', new Date().toISOString());
+        errorDiv.style.display = 'none';
+        showApp();
+        // Initialize the app after successful login
+        setTimeout(() => {
+          init();
+        }, 100);
+      } else {
+        // Login failed
+        errorDiv.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة. استخدم: admin / admin';
+        errorDiv.style.display = 'block';
+        document.getElementById('login-password').value = '';
+      }
+    }
+    
+    // Handle logout
+    function handleLogout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('loginTime');
+        showLogin();
+        document.getElementById('login-form').reset();
+        document.getElementById('login-error').style.display = 'none';
+      }
+    }
+    
+    // Initialize authentication check on page load
+    checkAuth();
+    
     let allData = [];
     
     const defaultConfig = {
@@ -849,6 +1016,13 @@
     };
     
     async function init() {
+      // Check authentication before initializing
+      const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+      if (!isAuthenticated) {
+        showLogin();
+        return;
+      }
+      
       const initResult = await window.dataSdk.init(dataHandler);
       if (!initResult.isOk) {
         showToast("فشل تحميل النظام");
@@ -1007,6 +1181,9 @@
         case 'invoices':
           renderInvoices();
           break;
+        case 'pos':
+          renderPOS();
+          break;
       }
     }
     
@@ -1094,6 +1271,12 @@
     function renderUnits() {
       const units = allData.filter(d => d.type === 'unit');
       const tbody = document.getElementById('units-body');
+      
+      // Update total units count
+      const totalUnitsCount = document.getElementById('total-units-count');
+      if (totalUnitsCount) {
+        totalUnitsCount.textContent = units.length;
+      }
       
       if (units.length === 0) {
         tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #6b7280;">لا توجد شقق</td></tr>';
@@ -1456,6 +1639,115 @@
       } else {
         showToast('فشل إعداد الشقة');
       }
+    }
+    
+    async function importAllProperties() {
+      if (!confirm('هل تريد استيراد جميع العقارات من القائمة؟ سيتم إضافة جميع الشقق المذكورة.')) {
+        return;
+      }
+      
+      // All properties from the spreadsheet
+      const properties = [
+        // Aster
+        { location: 'aster', unit_number: '150' },
+        { location: 'aster', unit_number: '145' },
+        { location: 'aster', unit_number: '424' },
+        { location: 'aster', unit_number: '350' },
+        { location: 'aster', unit_number: '345' },
+        
+        // Lamont
+        { location: 'lumont', unit_number: '106' },
+        { location: 'lumont', unit_number: '206' },
+        { location: 'lumont', unit_number: '305' },
+        { location: 'lumont', unit_number: '406' },
+        { location: 'lumont', unit_number: '408' },
+        
+        // Lumos
+        { location: 'lumos', unit_number: '305' },
+        
+        // Sky
+        { location: 'sky', unit_number: '641' },
+        { location: 'sky', unit_number: '642' },
+        
+        // Vantage
+        { location: 'vantage', unit_number: 'B1-PH1' },
+        { location: 'vantage', unit_number: 'B1-707' },
+        { location: 'vantage', unit_number: 'B1-703' },
+        { location: 'vantage', unit_number: 'B1-403' },
+        { location: 'vantage', unit_number: 'B1-203' },
+        { location: 'vantage', unit_number: 'B1-306' },
+        { location: 'vantage', unit_number: 'B1-301' },
+        { location: 'vantage', unit_number: 'B1-205' },
+        { location: 'vantage', unit_number: 'B1-604' },
+        { location: 'vantage', unit_number: 'B1-104' },
+        { location: 'vantage', unit_number: 'B2-PH3' },
+        { location: 'vantage', unit_number: 'B2-606' },
+        { location: 'vantage', unit_number: 'B2-721' },
+        { location: 'vantage', unit_number: 'B2-418' },
+        { location: 'vantage', unit_number: 'B2-412' },
+        { location: 'vantage', unit_number: 'B3-805' },
+        { location: 'vantage', unit_number: 'B3-105' },
+        { location: 'vantage', unit_number: 'B3-316' },
+        { location: 'vantage', unit_number: 'B3-501' },
+        { location: 'vantage', unit_number: 'B3-814' },
+        { location: 'vantage', unit_number: 'B4-PH2' },
+        { location: 'vantage', unit_number: 'B4-PH8' },
+        { location: 'vantage', unit_number: 'B4-416' },
+        { location: 'vantage', unit_number: 'B4-616' },
+        { location: 'vantage', unit_number: 'B4-503' },
+        { location: 'vantage', unit_number: 'B4-402' }
+      ];
+      
+      // Check existing units to avoid duplicates
+      const existingUnits = allData.filter(d => d.type === 'unit');
+      const existingKeys = new Set(existingUnits.map(u => `${u.location}-${u.unit_number}`));
+      
+      // Filter out existing units
+      const newProperties = properties.filter(p => {
+        const key = `${p.location}-${p.unit_number}`;
+        return !existingKeys.has(key);
+      });
+      
+      if (newProperties.length === 0) {
+        showToast('جميع العقارات موجودة بالفعل في النظام');
+        return;
+      }
+      
+      if (existingUnits.length + newProperties.length > 999) {
+        showToast(`لا يمكن إضافة جميع العقارات - الحد الأقصى 999 شقة`);
+        return;
+      }
+      
+      // Show progress
+      showToast(`جاري إضافة ${newProperties.length} شقة...`);
+      
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const prop of newProperties) {
+        const unitData = {
+          type: 'unit',
+          location: prop.location,
+          unit_number: prop.unit_number,
+          unit_type: 'Studio', // Default type, can be updated later
+          tenant_name: null,
+          tenant_phone: null,
+          occupants_count: 0,
+          id_image: null,
+          unit_status: 'Ready',
+          last_cleaning: new Date().toISOString().split('T')[0],
+          timestamp: new Date().toISOString()
+        };
+        
+        const result = await window.dataSdk.create(unitData);
+        if (result.isOk) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      }
+      
+      showToast(`تم إضافة ${successCount} شقة بنجاح${failCount > 0 ? `، فشل إضافة ${failCount} شقة` : ''}`);
     }
     
     function closeModal(modalId) {
@@ -2335,6 +2627,522 @@
       }
     }
     
+    function renderPOS() {
+      const posRecords = allData.filter(d => d.type === 'pos');
+      const tbody = document.getElementById('pos-body');
+      
+      if (posRecords.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #6b7280;">لا توجد دفعات</td></tr>';
+        return;
+      }
+      
+      posRecords.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      tbody.innerHTML = posRecords.map(pos => {
+        const capital = pos.capital || 0;
+        const tenantPrice = pos.tenant_price || 0;
+        const invoicesDeduction = pos.invoices_deduction || 0;
+        const profit = tenantPrice - capital - invoicesDeduction;
+        
+        const paidBadge = pos.is_paid ? 
+          '<span class="status-badge" style="background: #d1fae5; color: #065f46;">✅ مدفوعة</span>' : 
+          '<span class="status-badge" style="background: #fee2e2; color: #991b1b;">❌ غير مدفوعة</span>';
+        
+        const profitColor = profit >= 0 ? '#059669' : '#dc2626';
+        
+        return `
+        <tr>
+          <td>${pos.checkin_date}</td>
+          <td style="max-width: 200px; word-wrap: break-word;">${pos.unit_address}</td>
+          <td>${pos.phone_number}</td>
+          <td><strong>${capital.toFixed(2)} $</strong></td>
+          <td><strong>${tenantPrice.toFixed(2)} $</strong></td>
+          <td><strong style="color: #f59e0b;">${invoicesDeduction.toFixed(2)} $</strong></td>
+          <td><strong style="color: ${profitColor}; font-size: 1.125rem;">${profit.toFixed(2)} $</strong></td>
+          <td>${paidBadge}</td>
+          <td>${pos.payment_date || '-'}</td>
+          <td style="max-width: 150px; word-wrap: break-word;">${pos.notes || '-'}</td>
+          <td>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              ${pos.is_paid ? `<button class="btn-success" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="downloadInvoice('${pos.__backendId}')">📄 تحميل الفاتورة</button>` : ''}
+              ${pos.is_paid ? `<button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="sendInvoice('${pos.__backendId}')">📧 إرسال للمستأجر</button>` : ''}
+              <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="editPOS('${pos.__backendId}')">تعديل</button>
+              <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deletePOS('${pos.__backendId}')">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `}).join('');
+    }
+    
+    function updatePOSProfit() {
+      const capital = parseFloat(document.getElementById('pos-capital').value) || 0;
+      const tenantPrice = parseFloat(document.getElementById('pos-tenant-price').value) || 0;
+      const invoicesDeduction = parseFloat(document.getElementById('pos-invoices-deduction').value) || 0;
+      const profit = tenantPrice - capital - invoicesDeduction;
+      
+      const profitInput = document.getElementById('pos-profit');
+      profitInput.value = profit.toFixed(2) + ' $';
+      profitInput.style.color = profit >= 0 ? '#059669' : '#dc2626';
+    }
+    
+    function updatePaymentDate() {
+      const isPaid = document.getElementById('pos-paid').value === 'paid';
+      const paymentDateGroup = document.getElementById('pos-payment-date-group');
+      const paymentDateInput = document.getElementById('pos-payment-date');
+      
+      if (isPaid) {
+        paymentDateGroup.style.display = 'block';
+        if (!paymentDateInput.value) {
+          paymentDateInput.value = new Date().toISOString().split('T')[0];
+        }
+        paymentDateInput.required = true;
+      } else {
+        paymentDateGroup.style.display = 'none';
+        paymentDateInput.value = '';
+        paymentDateInput.required = false;
+      }
+    }
+    
+    function updatePOSUnits() {
+      const location = document.getElementById('pos-location').value;
+      const unitSelect = document.getElementById('pos-unit');
+      
+      // Get all units
+      const units = allData.filter(d => d.type === 'unit');
+      
+      // Filter by location if selected
+      let filteredUnits = units;
+      if (location) {
+        filteredUnits = units.filter(u => u.location === location);
+      }
+      
+      // Sort by unit number
+      filteredUnits.sort((a, b) => {
+        if (a.location !== b.location) return a.location.localeCompare(b.location);
+        return a.unit_number.localeCompare(b.unit_number);
+      });
+      
+      // Clear and populate unit select
+      unitSelect.innerHTML = '<option value="">اختر الشقة</option>';
+      filteredUnits.forEach(unit => {
+        const option = document.createElement('option');
+        option.value = unit.__backendId;
+        option.textContent = `${unit.location} - ${unit.unit_number}`;
+        unitSelect.appendChild(option);
+      });
+      
+      // Clear address and phone when location changes
+      document.getElementById('pos-address').value = '';
+      document.getElementById('pos-phone').value = '';
+    }
+    
+    function fillPOSFromUnit() {
+      const unitId = document.getElementById('pos-unit').value;
+      if (!unitId) {
+        document.getElementById('pos-address').value = '';
+        document.getElementById('pos-phone').value = '';
+        return;
+      }
+      
+      const unit = allData.find(d => d.__backendId === unitId);
+      if (!unit) return;
+      
+      // Fill address (can be unit address or location + unit number)
+      const address = unit.unit_address || `${unit.location} - ${unit.unit_number}`;
+      document.getElementById('pos-address').value = address;
+      
+      // Fill phone if available
+      if (unit.tenant_phone) {
+        document.getElementById('pos-phone').value = unit.tenant_phone;
+      }
+    }
+    
+    function openPOSModal() {
+      document.getElementById('pos-form').reset();
+      currentEditPOS = null;
+      document.getElementById('pos-checkin-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pos-profit').value = '0.00 $';
+      document.getElementById('pos-invoices-deduction').value = '0';
+      document.getElementById('pos-payment-date-group').style.display = 'none';
+      
+      // Update units list
+      updatePOSUnits();
+      
+      document.getElementById('pos-modal').classList.add('active');
+    }
+    
+    let currentEditPOS = null;
+    
+    function editPOS(id) {
+      const pos = allData.find(d => d.__backendId === id);
+      if (!pos) return;
+      
+      currentEditPOS = pos;
+      
+      document.getElementById('pos-checkin-date').value = pos.checkin_date || '';
+      document.getElementById('pos-location').value = pos.location || '';
+      
+      // Update units list and try to find matching unit
+      updatePOSUnits();
+      const units = allData.filter(d => d.type === 'unit');
+      const matchingUnit = units.find(u => u.location === pos.location && u.unit_number === pos.unit_number);
+      if (matchingUnit) {
+        document.getElementById('pos-unit').value = matchingUnit.__backendId;
+      } else {
+        document.getElementById('pos-unit').value = '';
+      }
+      
+      document.getElementById('pos-address').value = pos.unit_address || '';
+      document.getElementById('pos-phone').value = pos.phone_number || '';
+      document.getElementById('pos-capital').value = pos.capital || '';
+      document.getElementById('pos-tenant-price').value = pos.tenant_price || '';
+      document.getElementById('pos-invoices-deduction').value = pos.invoices_deduction || '0';
+      document.getElementById('pos-paid').value = pos.is_paid ? 'paid' : 'unpaid';
+      document.getElementById('pos-payment-date').value = pos.payment_date || '';
+      document.getElementById('pos-notes').value = pos.notes || '';
+      
+      updatePOSProfit();
+      updatePaymentDate();
+      
+      document.getElementById('pos-modal').classList.add('active');
+    }
+    
+    async function savePOS(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'pos').length >= 999 && !currentEditPOS) {
+        showToast("تم الوصول للحد الأقصى من الدفعات (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const isPaid = document.getElementById('pos-paid').value === 'paid';
+      const paymentDate = isPaid ? document.getElementById('pos-payment-date').value : null;
+      
+      // Get unit details from selected unit
+      const unitId = document.getElementById('pos-unit').value;
+      let unitNumber = '';
+      if (unitId) {
+        const selectedUnit = allData.find(d => d.__backendId === unitId);
+        if (selectedUnit) {
+          unitNumber = selectedUnit.unit_number;
+        }
+      }
+      // If no unit selected or not found, use the value as-is (for backward compatibility)
+      if (!unitNumber) {
+        const unitSelect = document.getElementById('pos-unit');
+        const selectedOption = unitSelect.options[unitSelect.selectedIndex];
+        if (selectedOption && selectedOption.textContent) {
+          // Extract unit number from "location - unit_number" format
+          const parts = selectedOption.textContent.split(' - ');
+          if (parts.length > 1) {
+            unitNumber = parts[1];
+          }
+        }
+        if (!unitNumber) {
+          unitNumber = unitId; // Fallback
+        }
+      }
+      
+      const posData = {
+        type: 'pos',
+        checkin_date: document.getElementById('pos-checkin-date').value,
+        location: document.getElementById('pos-location').value,
+        unit_number: unitNumber,
+        unit_address: document.getElementById('pos-address').value,
+        phone_number: document.getElementById('pos-phone').value,
+        capital: parseFloat(document.getElementById('pos-capital').value) || 0,
+        tenant_price: parseFloat(document.getElementById('pos-tenant-price').value) || 0,
+        invoices_deduction: parseFloat(document.getElementById('pos-invoices-deduction').value) || 0,
+        is_paid: isPaid,
+        payment_date: paymentDate,
+        notes: document.getElementById('pos-notes').value || null,
+        timestamp: new Date().toISOString()
+      };
+      
+      let result;
+      if (currentEditPOS) {
+        posData.__backendId = currentEditPOS.__backendId;
+        result = await window.dataSdk.update(posData);
+      } else {
+        result = await window.dataSdk.create(posData);
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        // If payment is marked as paid, create invoice automatically
+        if (isPaid && paymentDate) {
+          createInvoiceFromPOS(posData);
+        }
+        showToast(currentEditPOS ? 'تم تحديث الدفعة بنجاح' : 'تم إضافة الدفعة بنجاح');
+        closeModal('pos-modal');
+        form.reset();
+        currentEditPOS = null;
+      } else {
+        showToast('فشل حفظ الدفعة');
+      }
+    }
+    
+    async function deletePOS(id) {
+      const pos = allData.find(d => d.__backendId === id);
+      if (!pos) return;
+      
+      if (!confirm('هل أنت متأكد من حذف هذه الدفعة؟')) return;
+      
+      const result = await window.dataSdk.delete(pos);
+      
+      if (result.isOk) {
+        showToast('تم حذف الدفعة');
+      } else {
+        showToast('فشل حذف الدفعة');
+      }
+    }
+    
+    function createInvoiceFromPOS(posData) {
+      // Create invoice number
+      const invoiceNumber = 'INV-' + new Date().getTime();
+      
+      // Calculate totals
+      const capital = posData.capital || 0;
+      const tenantPrice = posData.tenant_price || 0;
+      const invoicesDeduction = posData.invoices_deduction || 0;
+      const profit = tenantPrice - capital - invoicesDeduction;
+      
+      // Store invoice data in posData for later use
+      posData.invoice_number = invoiceNumber;
+      posData.invoice_total = tenantPrice;
+      posData.invoice_profit = profit;
+    }
+    
+    function downloadInvoice(id) {
+      const pos = allData.find(d => d.__backendId === id);
+      if (!pos || !pos.is_paid) {
+        showToast('الدفعة غير مدفوعة');
+        return;
+      }
+      
+      const capital = pos.capital || 0;
+      const tenantPrice = pos.tenant_price || 0;
+      const invoicesDeduction = pos.invoices_deduction || 0;
+      const profit = tenantPrice - capital - invoicesDeduction;
+      const invoiceNumber = pos.invoice_number || 'INV-' + pos.__backendId;
+      
+      // Create invoice HTML
+      const invoiceHTML = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فاتورة ${invoiceNumber}</title>
+  <style>
+    @media print {
+      body { margin: 0; }
+      .no-print { display: none; }
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 3px solid #3b82f6;
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+    .invoice-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .info-box {
+      background: #f3f4f6;
+      padding: 1rem;
+      border-radius: 8px;
+      flex: 1;
+      margin: 0 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2rem 0;
+    }
+    th, td {
+      padding: 1rem;
+      text-align: right;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    .total-row {
+      background: #f3f4f6;
+      font-weight: bold;
+      font-size: 1.125rem;
+    }
+    .footer {
+      margin-top: 3rem;
+      text-align: center;
+      color: #6b7280;
+      border-top: 2px solid #e5e7eb;
+      padding-top: 1rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 0.5rem;
+      font-size: 1rem;
+    }
+    .btn:hover {
+      background: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="text-align: center; margin-bottom: 2rem;">
+    <button class="btn" onclick="window.print()">🖨️ طباعة</button>
+    <button class="btn" onclick="window.close()">❌ إغلاق</button>
+  </div>
+  
+  <div class="header">
+    <h1 style="color: #1f2937; margin: 0;">فاتورة إيجار</h1>
+    <p style="color: #6b7280; margin: 0.5rem 0;">Invoice Number: ${invoiceNumber}</p>
+  </div>
+  
+  <div class="invoice-info">
+    <div class="info-box">
+      <h3 style="margin-top: 0; color: #1f2937;">معلومات المستأجر</h3>
+      <p><strong>رقم الجوال:</strong> ${pos.phone_number}</p>
+      <p><strong>عنوان الشقة:</strong> ${pos.unit_address}</p>
+      <p><strong>الموقع:</strong> ${pos.location}</p>
+      <p><strong>رقم الشقة:</strong> ${pos.unit_number}</p>
+    </div>
+    <div class="info-box">
+      <h3 style="margin-top: 0; color: #1f2937;">معلومات الفاتورة</h3>
+      <p><strong>تاريخ الدخول:</strong> ${pos.checkin_date}</p>
+      <p><strong>تاريخ الدفع:</strong> ${pos.payment_date}</p>
+      <p><strong>حالة الدفع:</strong> ✅ مدفوعة</p>
+    </div>
+  </div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>الوصف</th>
+        <th>المبلغ ($)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>سعر المستأجر</td>
+        <td>${tenantPrice.toFixed(2)}</td>
+      </tr>
+      <tr>
+        <td>رأس المال</td>
+        <td style="color: #dc2626;">-${capital.toFixed(2)}</td>
+      </tr>
+      ${invoicesDeduction > 0 ? `
+      <tr>
+        <td>الفواتير المخصومة</td>
+        <td style="color: #dc2626;">-${invoicesDeduction.toFixed(2)}</td>
+      </tr>
+      ` : ''}
+      <tr class="total-row">
+        <td>قيمة الربح</td>
+        <td style="color: ${profit >= 0 ? '#059669' : '#dc2626'}; font-size: 1.25rem;">${profit.toFixed(2)} $</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  ${pos.notes ? `
+  <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-top: 2rem;">
+    <h3 style="margin-top: 0; color: #1f2937;">ملاحظات:</h3>
+    <p style="color: #4b5563;">${pos.notes}</p>
+  </div>
+  ` : ''}
+  
+  <div class="footer">
+    <p>شكراً لاستخدامك نظام إدارة الشقق</p>
+    <p style="font-size: 0.875rem;">تم إنشاء هذه الفاتورة تلقائياً</p>
+  </div>
+</body>
+</html>
+      `;
+      
+      // Create blob and download
+      const blob = new Blob([invoiceHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Invoice_${invoiceNumber}_${pos.checkin_date}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showToast('تم تحميل الفاتورة بنجاح');
+    }
+    
+    function sendInvoice(id) {
+      const pos = allData.find(d => d.__backendId === id);
+      if (!pos || !pos.is_paid) {
+        showToast('الدفعة غير مدفوعة');
+        return;
+      }
+      
+      if (!pos.phone_number) {
+        showToast('رقم الجوال غير متوفر');
+        return;
+      }
+      
+      // Create invoice summary for WhatsApp
+      const capital = pos.capital || 0;
+      const tenantPrice = pos.tenant_price || 0;
+      const invoicesDeduction = pos.invoices_deduction || 0;
+      const profit = tenantPrice - capital - invoicesDeduction;
+      const invoiceNumber = pos.invoice_number || 'INV-' + pos.__backendId;
+      
+      const message = `فاتورة إيجار - ${invoiceNumber}
+
+📍 الموقع: ${pos.location}
+🏠 الشقة: ${pos.unit_number}
+📱 رقم الجوال: ${pos.phone_number}
+📅 تاريخ الدخول: ${pos.checkin_date}
+✅ تاريخ الدفع: ${pos.payment_date}
+
+💰 التفاصيل:
+سعر المستأجر: ${tenantPrice.toFixed(2)} $
+رأس المال: ${capital.toFixed(2)} $
+${invoicesDeduction > 0 ? `الفواتير المخصومة: ${invoicesDeduction.toFixed(2)} $\n` : ''}
+📊 قيمة الربح: ${profit.toFixed(2)} $
+
+✅ حالة الدفع: مدفوعة
+
+شكراً لاستخدامك نظام إدارة الشقق`;
+
+      // Encode message for WhatsApp
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${pos.phone_number.replace(/[^0-9]/g, '')}?text=${encodedMessage}`;
+      
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank');
+      showToast('تم فتح WhatsApp لإرسال الفاتورة');
+    }
+    
     function showToast(message) {
       const existingToast = document.querySelector('.toast');
       if (existingToast) {
@@ -2350,8 +3158,6 @@
         toast.remove();
       }, 3000);
     }
-    
-    init();
   </script>
  </body>
 </html>
