@@ -356,6 +356,7 @@
       </div>
       <div style="display: flex; gap: 1rem;">
        <button class="btn-success" onclick="importAllProperties()">📥 استيراد جميع العقارات</button>
+       <button class="btn-danger" onclick="clearAllApartments()" style="background: #ef4444; color: white;">🗑️ مسح جميع الشقق</button>
        <button class="btn-primary" onclick="openUnitModal()">+ شقة جديدة</button>
       </div>
      </div>
@@ -1971,6 +1972,61 @@
       if (successCount > 0) {
         showToast(`تم تحميل ${successCount} شقة تلقائياً`);
       }
+    }
+    
+    // Clear all apartments from the system
+    async function clearAllApartments() {
+      const existingUnits = allData.filter(d => d.type === 'unit');
+      
+      if (existingUnits.length === 0) {
+        showToast('لا توجد شقق في النظام');
+        return;
+      }
+      
+      if (!confirm(`هل أنت متأكد من مسح جميع الشقق (${existingUnits.length} شقة)؟\n\nهذه العملية لا يمكن التراجع عنها!`)) {
+        return;
+      }
+      
+      if (!confirm('⚠️ تحذير نهائي: سيتم حذف جميع الشقق بشكل نهائي. هل أنت متأكد؟')) {
+        return;
+      }
+      
+      console.log('Clearing all apartments...', existingUnits.length);
+      
+      let deletedCount = 0;
+      let failedCount = 0;
+      
+      for (const unit of existingUnits) {
+        try {
+          const result = await window.dataSdk.delete(unit);
+          if (result.isOk) {
+            deletedCount++;
+          } else {
+            failedCount++;
+            console.error('Failed to delete unit:', unit, result.error);
+          }
+        } catch (error) {
+          failedCount++;
+          console.error('Exception deleting unit:', unit, error);
+        }
+      }
+      
+      // Reload data after deletion
+      await new Promise(resolve => setTimeout(resolve, 200));
+      const storedData = localStorage.getItem('apartment_management_data');
+      if (storedData) {
+        allData = JSON.parse(storedData);
+        if (window.dataSdk && window.dataSdk.dataHandler && window.dataSdk.dataHandler.onDataChanged) {
+          window.dataSdk.dataHandler.onDataChanged(allData);
+        }
+      }
+      
+      updateDashboard();
+      renderUnits();
+      
+      const message = `تم مسح ${deletedCount} شقة${failedCount > 0 ? `، فشل حذف ${failedCount} شقة` : ''}`;
+      showToast(message);
+      console.log('Clear completed:', message);
     }
     
     async function importAllProperties() {
