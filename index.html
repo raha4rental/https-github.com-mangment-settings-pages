@@ -239,7 +239,7 @@
     <p style="opacity: 0.8; margin-top: 0.25rem;">إدارة متكاملة للمواقع الخمسة</p>
    </header><!-- Navigation Tabs -->
    <nav style="background: white; padding: 0 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <div style="display: flex; gap: 1rem;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button>
+    <div style="display: flex; gap: 1rem;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button> <button class="tab-button" data-tab="maintenance" style="color: #6b7280;"> الصيانة </button> <button class="tab-button" data-tab="invoices" style="color: #6b7280;"> الفواتير </button>
     </div>
    </nav><!-- Main Content -->
    <main style="padding: 2rem; max-width: 1400px; margin: 0 auto;"><!-- Dashboard Tab -->
@@ -333,6 +333,10 @@
           <th>الموقع</th>
           <th>رقم الشقة</th>
           <th>النوع</th>
+          <th>اسم المستأجر</th>
+          <th>رقم الجوال</th>
+          <th>عدد الأشخاص</th>
+          <th>صورة الجواز/الهوية</th>
           <th>الحالة</th>
           <th>آخر تنظيف</th>
           <th>جاهزة للحجز</th>
@@ -461,6 +465,58 @@
        </table>
       </div>
      </div>
+    </div><!-- Maintenance Tab -->
+    <div id="maintenance-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة طلبات الصيانة</h2><button class="btn-primary" onclick="openMaintenanceModal()">+ طلب صيانة جديد</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="maintenance-table">
+        <thead>
+         <tr>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>نوع الصيانة</th>
+          <th>الوصف</th>
+          <th>التاريخ</th>
+          <th>الحالة</th>
+          <th>المسؤول</th>
+          <th>التكلفة</th>
+          <th>ملاحظات</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="maintenance-body"></tbody>
+       </table>
+      </div>
+     </div>
+    </div><!-- Invoices Tab -->
+    <div id="invoices-tab" class="tab-content" style="display: none;">
+     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.5rem; font-weight: bold;">إدارة الفواتير</h2><button class="btn-primary" onclick="openInvoiceModal()">+ فاتورة جديدة</button>
+     </div>
+     <div class="card">
+      <div class="table-container">
+       <table id="invoices-table">
+        <thead>
+         <tr>
+          <th>رقم الفاتورة</th>
+          <th>الموقع</th>
+          <th>رقم الشقة</th>
+          <th>النوع</th>
+          <th>المبلغ</th>
+          <th>التاريخ</th>
+          <th>الحالة</th>
+          <th>الصورة</th>
+          <th>ملاحظات</th>
+          <th>إجراءات</th>
+         </tr>
+        </thead>
+        <tbody id="invoices-body"></tbody>
+       </table>
+      </div>
+     </div>
     </div>
    </main><!-- Modals --> <!-- Booking Modal -->
    <div id="booking-modal" class="modal">
@@ -505,6 +561,15 @@
       <div class="form-group"><label for="unit-number">رقم الشقة</label> <input type="text" id="unit-number" required>
       </div>
       <div class="form-group"><label for="unit-type">نوع الشقة</label> <select id="unit-type" required> <option value="">اختر النوع</option> <option value="Studio">Studio</option> <option value="1BR">1BR</option> <option value="2BR">2BR</option> <option value="3BR">3BR</option> </select>
+      </div>
+      <div class="form-group"><label for="unit-tenant">اسم المستأجر</label> <input type="text" id="unit-tenant" placeholder="اسم المستأجر (اختياري)">
+      </div>
+      <div class="form-group"><label for="unit-phone">رقم الجوال</label> <input type="tel" id="unit-phone" placeholder="رقم الجوال (اختياري)">
+      </div>
+      <div class="form-group"><label for="unit-occupants">عدد الأشخاص</label> <input type="number" id="unit-occupants" min="0" value="0" placeholder="عدد الأشخاص">
+      </div>
+      <div class="form-group"><label for="unit-id-image">صورة الجواز/الهوية</label> <input type="file" id="unit-id-image" accept="image/*" onchange="handleUnitIdImage(event)"> <div id="unit-id-image-preview" style="margin-top: 0.5rem; display: none;"><img id="unit-id-preview-img" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e5e7eb;" alt="Preview"> <button type="button" onclick="clearUnitIdImage()" style="margin-top: 0.5rem; padding: 0.5rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">إزالة الصورة</button>
+      </div>
       </div>
       <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('unit-modal')">إلغاء</button>
       </div>
@@ -704,6 +769,61 @@
       </div>
      </form>
     </div>
+   </div><!-- Maintenance Modal -->
+   <div id="maintenance-modal" class="modal">
+    <div class="modal-content">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">طلب صيانة جديد</h2>
+     <form id="maintenance-form" onsubmit="saveMaintenance(event)">
+      <div class="form-group"><label for="maintenance-location">الموقع</label> <select id="maintenance-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
+      </div>
+      <div class="form-group"><label for="maintenance-unit">رقم الشقة</label> <input type="text" id="maintenance-unit" required>
+      </div>
+      <div class="form-group"><label for="maintenance-type">نوع الصيانة</label> <select id="maintenance-type" required> <option value="">اختر النوع</option> <option value="كهرباء">كهرباء</option> <option value="سباكة">سباكة</option> <option value="تكييف">تكييف</option> <option value="نظافة">نظافة</option> <option value="دهان">دهان</option> <option value="أخرى">أخرى</option> </select>
+      </div>
+      <div class="form-group"><label for="maintenance-description">الوصف</label> <textarea id="maintenance-description" rows="3" required placeholder="وصف المشكلة أو طلب الصيانة"></textarea>
+      </div>
+      <div class="form-group"><label for="maintenance-date">التاريخ</label> <input type="date" id="maintenance-date" required>
+      </div>
+      <div class="form-group"><label for="maintenance-status">الحالة</label> <select id="maintenance-status" required> <option value="Pending">⏳ قيد الانتظار</option> <option value="In Progress">🔄 قيد التنفيذ</option> <option value="Completed">✅ مكتملة</option> <option value="Cancelled">❌ ملغية</option> </select>
+      </div>
+      <div class="form-group"><label for="maintenance-assigned">المسؤول</label> <input type="text" id="maintenance-assigned" placeholder="اسم المسؤول عن الصيانة">
+      </div>
+      <div class="form-group"><label for="maintenance-cost">التكلفة</label> <input type="number" id="maintenance-cost" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="form-group"><label for="maintenance-notes">ملاحظات</label> <textarea id="maintenance-notes" rows="2" placeholder="ملاحظات إضافية"></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('maintenance-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
+   </div><!-- Invoice Modal -->
+   <div id="invoice-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+     <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">فاتورة جديدة</h2>
+     <form id="invoice-form" onsubmit="saveInvoice(event)">
+      <div class="form-group"><label for="invoice-number">رقم الفاتورة</label> <input type="text" id="invoice-number" required placeholder="رقم الفاتورة">
+      </div>
+      <div class="form-group"><label for="invoice-location">الموقع</label> <select id="invoice-location" required> <option value="">اختر الموقع</option> <option value="aster">aster</option> <option value="vantage">vantage</option> <option value="sky">sky</option> <option value="lumos">lumos</option> <option value="lumont">lumont</option> </select>
+      </div>
+      <div class="form-group"><label for="invoice-unit">رقم الشقة</label> <input type="text" id="invoice-unit" required>
+      </div>
+      <div class="form-group"><label for="invoice-type">نوع الفاتورة</label> <select id="invoice-type" required> <option value="">اختر النوع</option> <option value="صيانة">صيانة</option> <option value="خدمات">خدمات</option> <option value="كهرباء">كهرباء</option> <option value="ماء">ماء</option> <option value="إنترنت">إنترنت</option> <option value="أخرى">أخرى</option> </select>
+      </div>
+      <div class="form-group"><label for="invoice-amount">المبلغ</label> <input type="number" id="invoice-amount" min="0" step="0.01" required placeholder="0.00">
+      </div>
+      <div class="form-group"><label for="invoice-date">التاريخ</label> <input type="date" id="invoice-date" required>
+      </div>
+      <div class="form-group"><label for="invoice-status">الحالة</label> <select id="invoice-status" required> <option value="Pending">⏳ قيد الانتظار</option> <option value="Paid">✅ مدفوعة</option> <option value="Overdue">⚠️ متأخرة</option> <option value="Cancelled">❌ ملغية</option> </select>
+      </div>
+      <div class="form-group"><label for="invoice-image">صورة الفاتورة</label> <input type="file" id="invoice-image" accept="image/*" onchange="handleInvoiceImage(event)"> <div id="invoice-image-preview" style="margin-top: 0.5rem; display: none;"><img id="invoice-preview-img" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e5e7eb;" alt="Preview"> <button type="button" onclick="clearInvoiceImage()" style="margin-top: 0.5rem; padding: 0.5rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">إزالة الصورة</button>
+      </div>
+      </div>
+      <div class="form-group"><label for="invoice-notes">ملاحظات</label> <textarea id="invoice-notes" rows="2" placeholder="ملاحظات إضافية"></textarea>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem;"><button type="submit" class="btn-primary" style="flex: 1;">حفظ</button> <button type="button" class="btn-secondary" style="flex: 1;" onclick="closeModal('invoice-modal')">إلغاء</button>
+      </div>
+     </form>
+    </div>
    </div>
   </div>
   <script>
@@ -881,6 +1001,12 @@
         case 'delivery':
           renderDelivery();
           break;
+        case 'maintenance':
+          renderMaintenance();
+          break;
+        case 'invoices':
+          renderInvoices();
+          break;
       }
     }
     
@@ -970,7 +1096,7 @@
       const tbody = document.getElementById('units-body');
       
       if (units.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280;">لا توجد شقق</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #6b7280;">لا توجد شقق</td></tr>';
         return;
       }
       
@@ -979,11 +1105,18 @@
           <td>${u.location}</td>
           <td>${u.unit_number}</td>
           <td>${u.unit_type}</td>
+          <td>${u.tenant_name || '-'}</td>
+          <td>${u.tenant_phone || '-'}</td>
+          <td>${u.occupants_count || 0}</td>
+          <td>${u.id_image ? `<button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="viewUnitIdImage('${u.__backendId}')">👁️ عرض</button>` : '-'}</td>
           <td>${getUnitStatusBadge(u.unit_status)}</td>
           <td>${u.last_cleaning || '-'}</td>
           <td>${u.unit_status === 'Ready' ? '✅' : '❌'}</td>
           <td>
-            <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteUnit('${u.__backendId}')">حذف</button>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="editUnit('${u.__backendId}')">تعديل</button>
+              <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteUnit('${u.__backendId}')">حذف</button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -1165,10 +1298,6 @@
     
     function openBookingModal() {
       document.getElementById('booking-modal').classList.add('active');
-    }
-    
-    function openUnitModal() {
-      document.getElementById('unit-modal').classList.add('active');
     }
     
     function openCleaningModal() {
@@ -1376,10 +1505,87 @@
       }
     }
     
+    let unitIdImageBase64 = null;
+    let currentEditUnit = null;
+    
+    function handleUnitIdImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.startsWith('image/')) {
+        showToast('الرجاء اختيار ملف صورة');
+        event.target.value = '';
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('حجم الصورة كبير جداً (الحد الأقصى 5MB)');
+        event.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        unitIdImageBase64 = e.target.result;
+        const preview = document.getElementById('unit-id-image-preview');
+        const previewImg = document.getElementById('unit-id-preview-img');
+        previewImg.src = unitIdImageBase64;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function clearUnitIdImage() {
+      unitIdImageBase64 = null;
+      document.getElementById('unit-id-image').value = '';
+      document.getElementById('unit-id-image-preview').style.display = 'none';
+    }
+    
+    function viewUnitIdImage(id) {
+      const unit = allData.find(d => d.__backendId === id);
+      if (!unit || !unit.id_image) return;
+      
+      const newWindow = window.open();
+      newWindow.document.write(`<html><head><title>صورة الجواز/الهوية</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#f3f4f6;"><img src="${unit.id_image}" style="max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);"></body></html>`);
+    }
+    
+    function openUnitModal() {
+      document.getElementById('unit-form').reset();
+      unitIdImageBase64 = null;
+      currentEditUnit = null;
+      document.getElementById('unit-id-image-preview').style.display = 'none';
+      document.getElementById('unit-occupants').value = 0;
+      document.getElementById('unit-modal').classList.add('active');
+    }
+    
+    function editUnit(id) {
+      const unit = allData.find(d => d.__backendId === id);
+      if (!unit) return;
+      
+      currentEditUnit = unit;
+      unitIdImageBase64 = unit.id_image || null;
+      
+      document.getElementById('unit-location').value = unit.location || '';
+      document.getElementById('unit-number').value = unit.unit_number || '';
+      document.getElementById('unit-type').value = unit.unit_type || '';
+      document.getElementById('unit-tenant').value = unit.tenant_name || '';
+      document.getElementById('unit-phone').value = unit.tenant_phone || '';
+      document.getElementById('unit-occupants').value = unit.occupants_count || 0;
+      
+      if (unitIdImageBase64) {
+        const preview = document.getElementById('unit-id-image-preview');
+        const previewImg = document.getElementById('unit-id-preview-img');
+        previewImg.src = unitIdImageBase64;
+        preview.style.display = 'block';
+      }
+      
+      document.getElementById('unit-modal').classList.add('active');
+    }
+    
     async function saveUnit(event) {
       event.preventDefault();
       
-      if (allData.filter(d => d.type === 'unit').length >= 999) {
+      if (allData.filter(d => d.type === 'unit').length >= 999 && !currentEditUnit) {
         showToast("تم الوصول للحد الأقصى من الشقق (999)");
         return;
       }
@@ -1394,20 +1600,33 @@
         location: document.getElementById('unit-location').value,
         unit_number: document.getElementById('unit-number').value,
         unit_type: document.getElementById('unit-type').value,
-        unit_status: 'Ready',
-        last_cleaning: new Date().toISOString().split('T')[0],
+        tenant_name: document.getElementById('unit-tenant').value || null,
+        tenant_phone: document.getElementById('unit-phone').value || null,
+        occupants_count: parseInt(document.getElementById('unit-occupants').value) || 0,
+        id_image: unitIdImageBase64 || null,
+        unit_status: currentEditUnit ? (currentEditUnit.unit_status || 'Ready') : 'Ready',
+        last_cleaning: currentEditUnit ? (currentEditUnit.last_cleaning || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
         timestamp: new Date().toISOString()
       };
       
-      const result = await window.dataSdk.create(unitData);
+      let result;
+      if (currentEditUnit) {
+        unitData.__backendId = currentEditUnit.__backendId;
+        result = await window.dataSdk.update(unitData);
+      } else {
+        result = await window.dataSdk.create(unitData);
+      }
       
       submitBtn.disabled = false;
       submitBtn.textContent = 'حفظ';
       
       if (result.isOk) {
-        showToast('تم إضافة الشقة بنجاح');
+        showToast(currentEditUnit ? 'تم تحديث الشقة بنجاح' : 'تم إضافة الشقة بنجاح');
         closeModal('unit-modal');
         form.reset();
+        unitIdImageBase64 = null;
+        document.getElementById('unit-id-image-preview').style.display = 'none';
+        currentEditUnit = null;
       } else {
         showToast('فشل حفظ الشقة');
       }
@@ -1783,6 +2002,336 @@
         showToast('تم حذف طلب التوصيل');
       } else {
         showToast('فشل حذف طلب التوصيل');
+      }
+    }
+    
+    function renderMaintenance() {
+      const maintenance = allData.filter(d => d.type === 'maintenance');
+      const tbody = document.getElementById('maintenance-body');
+      
+      if (maintenance.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #6b7280;">لا توجد طلبات صيانة</td></tr>';
+        return;
+      }
+      
+      maintenance.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      tbody.innerHTML = maintenance.map(m => `
+        <tr>
+          <td>${m.location}</td>
+          <td>${m.unit_number}</td>
+          <td>${m.maintenance_type}</td>
+          <td style="max-width: 200px; word-wrap: break-word;">${m.description || '-'}</td>
+          <td>${m.maintenance_date}</td>
+          <td>${getMaintenanceStatusBadge(m.maintenance_status)}</td>
+          <td>${m.assigned_to || '-'}</td>
+          <td>${m.cost ? m.cost.toFixed(2) + ' ر.س' : '-'}</td>
+          <td style="max-width: 150px; word-wrap: break-word;">${m.notes || '-'}</td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="editMaintenance('${m.__backendId}')">تعديل</button>
+              <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteMaintenance('${m.__backendId}')">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function renderInvoices() {
+      const invoices = allData.filter(d => d.type === 'invoice');
+      const tbody = document.getElementById('invoices-body');
+      
+      if (invoices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #6b7280;">لا توجد فواتير</td></tr>';
+        return;
+      }
+      
+      invoices.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      tbody.innerHTML = invoices.map(inv => `
+        <tr>
+          <td><strong>${inv.invoice_number}</strong></td>
+          <td>${inv.location}</td>
+          <td>${inv.unit_number}</td>
+          <td>${inv.invoice_type}</td>
+          <td><strong>${inv.amount.toFixed(2)} ر.س</strong></td>
+          <td>${inv.invoice_date}</td>
+          <td>${getInvoiceStatusBadge(inv.invoice_status)}</td>
+          <td>${inv.image ? `<button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="viewInvoiceImage('${inv.__backendId}')">👁️ عرض</button>` : '-'}</td>
+          <td style="max-width: 150px; word-wrap: break-word;">${inv.notes || '-'}</td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="editInvoice('${inv.__backendId}')">تعديل</button>
+              <button class="btn-danger" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="deleteInvoice('${inv.__backendId}')">حذف</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function getMaintenanceStatusBadge(status) {
+      const colors = {
+        'Pending': 'background: #fef3c7; color: #92400e',
+        'In Progress': 'background: #dbeafe; color: #1e40af',
+        'Completed': 'background: #d1fae5; color: #065f46',
+        'Cancelled': 'background: #fee2e2; color: #991b1b'
+      };
+      const labels = {
+        'Pending': '⏳ قيد الانتظار',
+        'In Progress': '🔄 قيد التنفيذ',
+        'Completed': '✅ مكتملة',
+        'Cancelled': '❌ ملغية'
+      };
+      return `<span class="status-badge" style="${colors[status] || ''}">${labels[status] || status}</span>`;
+    }
+    
+    function getInvoiceStatusBadge(status) {
+      const colors = {
+        'Pending': 'background: #fef3c7; color: #92400e',
+        'Paid': 'background: #d1fae5; color: #065f46',
+        'Overdue': 'background: #fee2e2; color: #991b1b',
+        'Cancelled': 'background: #e5e7eb; color: #374151'
+      };
+      const labels = {
+        'Pending': '⏳ قيد الانتظار',
+        'Paid': '✅ مدفوعة',
+        'Overdue': '⚠️ متأخرة',
+        'Cancelled': '❌ ملغية'
+      };
+      return `<span class="status-badge" style="${colors[status] || ''}">${labels[status] || status}</span>`;
+    }
+    
+    function openMaintenanceModal() {
+      document.getElementById('maintenance-form').reset();
+      document.getElementById('maintenance-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('maintenance-modal').classList.add('active');
+    }
+    
+    let currentEditMaintenance = null;
+    
+    function editMaintenance(id) {
+      const maintenance = allData.find(d => d.__backendId === id);
+      if (!maintenance) return;
+      
+      currentEditMaintenance = maintenance;
+      
+      document.getElementById('maintenance-location').value = maintenance.location || '';
+      document.getElementById('maintenance-unit').value = maintenance.unit_number || '';
+      document.getElementById('maintenance-type').value = maintenance.maintenance_type || '';
+      document.getElementById('maintenance-description').value = maintenance.description || '';
+      document.getElementById('maintenance-date').value = maintenance.maintenance_date || '';
+      document.getElementById('maintenance-status').value = maintenance.maintenance_status || 'Pending';
+      document.getElementById('maintenance-assigned').value = maintenance.assigned_to || '';
+      document.getElementById('maintenance-cost').value = maintenance.cost || '';
+      document.getElementById('maintenance-notes').value = maintenance.notes || '';
+      
+      document.getElementById('maintenance-modal').classList.add('active');
+    }
+    
+    async function saveMaintenance(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'maintenance').length >= 999 && !currentEditMaintenance) {
+        showToast("تم الوصول للحد الأقصى من طلبات الصيانة (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const maintenanceData = {
+        type: 'maintenance',
+        location: document.getElementById('maintenance-location').value,
+        unit_number: document.getElementById('maintenance-unit').value,
+        maintenance_type: document.getElementById('maintenance-type').value,
+        description: document.getElementById('maintenance-description').value,
+        maintenance_date: document.getElementById('maintenance-date').value,
+        maintenance_status: document.getElementById('maintenance-status').value,
+        assigned_to: document.getElementById('maintenance-assigned').value || null,
+        cost: document.getElementById('maintenance-cost').value ? parseFloat(document.getElementById('maintenance-cost').value) : null,
+        notes: document.getElementById('maintenance-notes').value || null,
+        timestamp: new Date().toISOString()
+      };
+      
+      let result;
+      if (currentEditMaintenance) {
+        maintenanceData.__backendId = currentEditMaintenance.__backendId;
+        result = await window.dataSdk.update(maintenanceData);
+      } else {
+        result = await window.dataSdk.create(maintenanceData);
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast(currentEditMaintenance ? 'تم تحديث طلب الصيانة بنجاح' : 'تم إضافة طلب الصيانة بنجاح');
+        closeModal('maintenance-modal');
+        form.reset();
+        currentEditMaintenance = null;
+      } else {
+        showToast('فشل حفظ طلب الصيانة');
+      }
+    }
+    
+    async function deleteMaintenance(id) {
+      const maintenance = allData.find(d => d.__backendId === id);
+      if (!maintenance) return;
+      
+      if (!confirm('هل أنت متأكد من حذف طلب الصيانة؟')) return;
+      
+      const result = await window.dataSdk.delete(maintenance);
+      
+      if (result.isOk) {
+        showToast('تم حذف طلب الصيانة');
+      } else {
+        showToast('فشل حذف طلب الصيانة');
+      }
+    }
+    
+    let invoiceImageBase64 = null;
+    
+    function handleInvoiceImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      if (!file.type.startsWith('image/')) {
+        showToast('الرجاء اختيار ملف صورة');
+        event.target.value = '';
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('حجم الصورة كبير جداً (الحد الأقصى 5MB)');
+        event.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        invoiceImageBase64 = e.target.result;
+        const preview = document.getElementById('invoice-image-preview');
+        const previewImg = document.getElementById('invoice-preview-img');
+        previewImg.src = invoiceImageBase64;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function clearInvoiceImage() {
+      invoiceImageBase64 = null;
+      document.getElementById('invoice-image').value = '';
+      document.getElementById('invoice-image-preview').style.display = 'none';
+    }
+    
+    function viewInvoiceImage(id) {
+      const invoice = allData.find(d => d.__backendId === id);
+      if (!invoice || !invoice.image) return;
+      
+      const newWindow = window.open();
+      newWindow.document.write(`<html><head><title>صورة الفاتورة</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;height:100vh;background:#f3f4f6;"><img src="${invoice.image}" style="max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);"></body></html>`);
+    }
+    
+    function openInvoiceModal() {
+      document.getElementById('invoice-form').reset();
+      invoiceImageBase64 = null;
+      document.getElementById('invoice-image-preview').style.display = 'none';
+      document.getElementById('invoice-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('invoice-modal').classList.add('active');
+    }
+    
+    let currentEditInvoice = null;
+    
+    function editInvoice(id) {
+      const invoice = allData.find(d => d.__backendId === id);
+      if (!invoice) return;
+      
+      currentEditInvoice = invoice;
+      invoiceImageBase64 = invoice.image || null;
+      
+      document.getElementById('invoice-number').value = invoice.invoice_number || '';
+      document.getElementById('invoice-location').value = invoice.location || '';
+      document.getElementById('invoice-unit').value = invoice.unit_number || '';
+      document.getElementById('invoice-type').value = invoice.invoice_type || '';
+      document.getElementById('invoice-amount').value = invoice.amount || '';
+      document.getElementById('invoice-date').value = invoice.invoice_date || '';
+      document.getElementById('invoice-status').value = invoice.invoice_status || 'Pending';
+      document.getElementById('invoice-notes').value = invoice.notes || '';
+      
+      if (invoiceImageBase64) {
+        const preview = document.getElementById('invoice-image-preview');
+        const previewImg = document.getElementById('invoice-preview-img');
+        previewImg.src = invoiceImageBase64;
+        preview.style.display = 'block';
+      }
+      
+      document.getElementById('invoice-modal').classList.add('active');
+    }
+    
+    async function saveInvoice(event) {
+      event.preventDefault();
+      
+      if (allData.filter(d => d.type === 'invoice').length >= 999 && !currentEditInvoice) {
+        showToast("تم الوصول للحد الأقصى من الفواتير (999)");
+        return;
+      }
+      
+      const form = event.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'جاري الحفظ...';
+      
+      const invoiceData = {
+        type: 'invoice',
+        invoice_number: document.getElementById('invoice-number').value,
+        location: document.getElementById('invoice-location').value,
+        unit_number: document.getElementById('invoice-unit').value,
+        invoice_type: document.getElementById('invoice-type').value,
+        amount: parseFloat(document.getElementById('invoice-amount').value),
+        invoice_date: document.getElementById('invoice-date').value,
+        invoice_status: document.getElementById('invoice-status').value,
+        image: invoiceImageBase64 || null,
+        notes: document.getElementById('invoice-notes').value || null,
+        timestamp: new Date().toISOString()
+      };
+      
+      let result;
+      if (currentEditInvoice) {
+        invoiceData.__backendId = currentEditInvoice.__backendId;
+        result = await window.dataSdk.update(invoiceData);
+      } else {
+        result = await window.dataSdk.create(invoiceData);
+      }
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'حفظ';
+      
+      if (result.isOk) {
+        showToast(currentEditInvoice ? 'تم تحديث الفاتورة بنجاح' : 'تم إضافة الفاتورة بنجاح');
+        closeModal('invoice-modal');
+        form.reset();
+        invoiceImageBase64 = null;
+        document.getElementById('invoice-image-preview').style.display = 'none';
+        currentEditInvoice = null;
+      } else {
+        showToast('فشل حفظ الفاتورة');
+      }
+    }
+    
+    async function deleteInvoice(id) {
+      const invoice = allData.find(d => d.__backendId === id);
+      if (!invoice) return;
+      
+      if (!confirm('هل أنت متأكد من حذف الفاتورة؟')) return;
+      
+      const result = await window.dataSdk.delete(invoice);
+      
+      if (result.isOk) {
+        showToast('تم حذف الفاتورة');
+      } else {
+        showToast('فشل حذف الفاتورة');
       }
     }
     
