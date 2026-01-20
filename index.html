@@ -1142,6 +1142,9 @@
         return;
       }
       
+      // Initialize default apartments if none exist
+      await initializeDefaultApartments();
+      
       if (window.elementSdk) {
         window.elementSdk.init({
           defaultConfig,
@@ -1241,6 +1244,7 @@
     }
     
     // Tab switching function - called directly from button clicks
+    // This is now also available as window.switchTab (defined below)
     function switchTab(tabName) {
       if (!tabName) {
         console.error('No tab name provided');
@@ -1285,6 +1289,9 @@
       }
     }
     
+    // Make switchTab available globally to ensure it works with inline onclick handlers
+    window.switchTab = switchTab;
+    
     // Use event delegation on the navigation element
     let tabsSetup = false;
     
@@ -1296,17 +1303,23 @@
         return;
       }
       
-      // Only setup once
+      // Only setup once per page load
       if (tabsSetup) {
-        console.log('Tabs already setup');
+        console.log('Tabs already setup, skipping...');
         return;
       }
       
-      // Use event delegation - listen on nav element
-      nav.addEventListener('click', function(e) {
+      // Use event delegation - listen on nav element (can add multiple listeners safely)
+      // Remove any existing listener first by cloning the nav
+      const newNav = nav.cloneNode(true);
+      nav.parentNode.replaceChild(newNav, nav);
+      const currentNav = document.querySelector('nav');
+      
+      // Add event listener on the current nav
+      currentNav.addEventListener('click', function(e) {
         // Check if clicked element is a tab button or inside one
         let button = e.target;
-        while (button && button !== nav && !button.classList.contains('tab-button')) {
+        while (button && button !== currentNav && !button.classList.contains('tab-button')) {
           button = button.parentElement;
         }
         
@@ -1316,10 +1329,11 @@
         
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         
         const tabName = button.dataset.tab;
-        if (tabName) {
-          switchTab(tabName);
+        if (tabName && typeof window.switchTab === 'function') {
+          window.switchTab(tabName);
         }
       });
       
@@ -1330,11 +1344,19 @@
         if (tabName) {
           // Remove any existing onclick
           button.onclick = null;
-          // Add new onclick
+          // Add new onclick handler that ensures switchTab is called
           button.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            switchTab(tabName);
+            e.stopImmediatePropagation();
+            if (typeof window.switchTab === 'function') {
+              window.switchTab(tabName);
+            } else if (typeof switchTab === 'function') {
+              switchTab(tabName);
+            } else {
+              console.error('switchTab function not found');
+            }
+            return false;
           };
         }
       });
@@ -1837,35 +1859,43 @@
       }
     }
     
-    async function importAllProperties() {
-      if (!confirm('هل تريد استيراد جميع العقارات من القائمة؟ سيتم إضافة جميع الشقق المذكورة.')) {
+    // Initialize default apartments (39 apartments)
+    async function initializeDefaultApartments() {
+      const existingUnits = allData.filter(d => d.type === 'unit');
+      
+      if (existingUnits.length > 0) {
+        console.log(`Found ${existingUnits.length} existing apartments. Skipping initialization.`);
         return;
       }
       
-      // All properties from the spreadsheet
+      console.log('Initializing default 39 apartments...');
+      
+      // All 39 properties
       const properties = [
-        // Aster
+        // Aster (5 apartments)
         { location: 'aster', unit_number: '150' },
         { location: 'aster', unit_number: '145' },
         { location: 'aster', unit_number: '424' },
         { location: 'aster', unit_number: '350' },
         { location: 'aster', unit_number: '345' },
         
-        // Lamont
+        // Lamont (5 apartments)
         { location: 'lumont', unit_number: '106' },
         { location: 'lumont', unit_number: '206' },
         { location: 'lumont', unit_number: '305' },
         { location: 'lumont', unit_number: '406' },
         { location: 'lumont', unit_number: '408' },
         
-        // Lumos
+        // Lumos (2 apartments)
         { location: 'lumos', unit_number: '305' },
+        { location: 'lumos', unit_number: '405' },
         
-        // Sky
+        // Sky (3 apartments)
         { location: 'sky', unit_number: '641' },
         { location: 'sky', unit_number: '642' },
+        { location: 'sky', unit_number: '643' },
         
-        // Vantage
+        // Vantage (24 apartments)
         { location: 'vantage', unit_number: 'B1-PH1' },
         { location: 'vantage', unit_number: 'B1-707' },
         { location: 'vantage', unit_number: 'B1-703' },
@@ -1891,7 +1921,117 @@
         { location: 'vantage', unit_number: 'B4-416' },
         { location: 'vantage', unit_number: 'B4-616' },
         { location: 'vantage', unit_number: 'B4-503' },
-        { location: 'vantage', unit_number: 'B4-402' }
+        { location: 'vantage', unit_number: 'B4-402' },
+        { location: 'vantage', unit_number: 'B4-505' },
+        { location: 'vantage', unit_number: 'B4-702' }
+      ];
+      
+      let successCount = 0;
+      let failCount = 0;
+      
+      for (const prop of properties) {
+        const unitData = {
+          type: 'unit',
+          location: prop.location,
+          unit_number: prop.unit_number,
+          unit_type: 'Studio',
+          tenant_name: null,
+          tenant_phone: null,
+          occupants_count: 0,
+          id_image: null,
+          unit_status: 'Ready',
+          last_cleaning: new Date().toISOString().split('T')[0],
+          timestamp: new Date().toISOString()
+        };
+        
+        try {
+          const result = await window.dataSdk.create(unitData);
+          if (result.isOk) {
+            successCount++;
+          } else {
+            failCount++;
+            console.error('Failed to create unit:', prop, result.error);
+          }
+        } catch (error) {
+          failCount++;
+          console.error('Exception creating unit:', prop, error);
+        }
+      }
+      
+      // Reload data after initialization
+      const storedData = localStorage.getItem('apartment_management_data');
+      if (storedData) {
+        allData = JSON.parse(storedData);
+        if (window.dataSdk && window.dataSdk.dataHandler && window.dataSdk.dataHandler.onDataChanged) {
+          window.dataSdk.dataHandler.onDataChanged(allData);
+        }
+      }
+      
+      console.log(`Initialized ${successCount} apartments. Failed: ${failCount}`);
+      if (successCount > 0) {
+        showToast(`تم تحميل ${successCount} شقة تلقائياً`);
+      }
+    }
+    
+    async function importAllProperties() {
+      if (!confirm('هل تريد استيراد جميع العقارات من القائمة؟ سيتم إضافة جميع الشقق المذكورة.')) {
+        return;
+      }
+      
+      // All properties from the spreadsheet - Total: 39 apartments
+      const properties = [
+        // Aster (5 apartments)
+        { location: 'aster', unit_number: '150' },
+        { location: 'aster', unit_number: '145' },
+        { location: 'aster', unit_number: '424' },
+        { location: 'aster', unit_number: '350' },
+        { location: 'aster', unit_number: '345' },
+        
+        // Lamont (5 apartments)
+        { location: 'lumont', unit_number: '106' },
+        { location: 'lumont', unit_number: '206' },
+        { location: 'lumont', unit_number: '305' },
+        { location: 'lumont', unit_number: '406' },
+        { location: 'lumont', unit_number: '408' },
+        
+        // Lumos (2 apartments)
+        { location: 'lumos', unit_number: '305' },
+        { location: 'lumos', unit_number: '405' },
+        
+        // Sky (3 apartments)
+        { location: 'sky', unit_number: '641' },
+        { location: 'sky', unit_number: '642' },
+        { location: 'sky', unit_number: '643' },
+        
+        // Vantage (24 apartments)
+        { location: 'vantage', unit_number: 'B1-PH1' },
+        { location: 'vantage', unit_number: 'B1-707' },
+        { location: 'vantage', unit_number: 'B1-703' },
+        { location: 'vantage', unit_number: 'B1-403' },
+        { location: 'vantage', unit_number: 'B1-203' },
+        { location: 'vantage', unit_number: 'B1-306' },
+        { location: 'vantage', unit_number: 'B1-301' },
+        { location: 'vantage', unit_number: 'B1-205' },
+        { location: 'vantage', unit_number: 'B1-604' },
+        { location: 'vantage', unit_number: 'B1-104' },
+        { location: 'vantage', unit_number: 'B2-PH3' },
+        { location: 'vantage', unit_number: 'B2-606' },
+        { location: 'vantage', unit_number: 'B2-721' },
+        { location: 'vantage', unit_number: 'B2-418' },
+        { location: 'vantage', unit_number: 'B2-412' },
+        { location: 'vantage', unit_number: 'B3-805' },
+        { location: 'vantage', unit_number: 'B3-105' },
+        { location: 'vantage', unit_number: 'B3-316' },
+        { location: 'vantage', unit_number: 'B3-501' },
+        { location: 'vantage', unit_number: 'B3-814' },
+        { location: 'vantage', unit_number: 'B4-PH2' },
+        { location: 'vantage', unit_number: 'B4-PH8' },
+        { location: 'vantage', unit_number: 'B4-416' },
+        { location: 'vantage', unit_number: 'B4-616' },
+        { location: 'vantage', unit_number: 'B4-503' },
+        { location: 'vantage', unit_number: 'B4-402' },
+        { location: 'vantage', unit_number: 'B4-505' },
+        { location: 'vantage', unit_number: 'B4-702' }
       ];
       
       // Check existing units to avoid duplicates
@@ -1916,34 +2056,99 @@
       
       // Show progress
       showToast(`جاري إضافة ${newProperties.length} شقة...`);
+      console.log('Starting import of', newProperties.length, 'apartments');
       
       let successCount = 0;
       let failCount = 0;
       
-      for (const prop of newProperties) {
-        const unitData = {
-          type: 'unit',
-          location: prop.location,
-          unit_number: prop.unit_number,
-          unit_type: 'Studio', // Default type, can be updated later
-          tenant_name: null,
-          tenant_phone: null,
-          occupants_count: 0,
-          id_image: null,
-          unit_status: 'Ready',
-          last_cleaning: new Date().toISOString().split('T')[0],
-          timestamp: new Date().toISOString()
-        };
-        
-        const result = await window.dataSdk.create(unitData);
-        if (result.isOk) {
-          successCount++;
-        } else {
+      // Create all units - batch create for better performance
+      const unitsToAdd = newProperties.map(prop => ({
+        type: 'unit',
+        location: prop.location,
+        unit_number: prop.unit_number,
+        unit_type: 'Studio', // Default type, can be updated later
+        tenant_name: null,
+        tenant_phone: null,
+        occupants_count: 0,
+        id_image: null,
+        unit_status: 'Ready',
+        last_cleaning: new Date().toISOString().split('T')[0],
+        timestamp: new Date().toISOString()
+      }));
+      
+      // Add units one by one and wait for each
+      for (let i = 0; i < unitsToAdd.length; i++) {
+        const unitData = unitsToAdd[i];
+        try {
+          const result = await window.dataSdk.create(unitData);
+          if (result.isOk) {
+            successCount++;
+            console.log(`✓ [${i+1}/${unitsToAdd.length}] Added: ${unitData.location}-${unitData.unit_number}`);
+          } else {
+            failCount++;
+            console.error(`✗ [${i+1}/${unitsToAdd.length}] Failed: ${unitData.location}-${unitData.unit_number}`, result.error);
+          }
+        } catch (error) {
           failCount++;
+          console.error(`✗ [${i+1}/${unitsToAdd.length}] Exception: ${unitData.location}-${unitData.unit_number}`, error);
+        }
+        
+        // Small delay to prevent overwhelming the system
+        if (i < unitsToAdd.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 10));
         }
       }
       
-      showToast(`تم إضافة ${successCount} شقة بنجاح${failCount > 0 ? `، فشل إضافة ${failCount} شقة` : ''}`);
+      console.log(`Import loop completed. Success: ${successCount}, Failed: ${failCount}`);
+      
+      // Force refresh data after import - wait for all operations to complete
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Reload from localStorage to ensure we have latest data
+      const storedData = localStorage.getItem('apartment_management_data');
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+          const unitsCount = parsedData.filter(d => d.type === 'unit').length;
+          console.log('Final check - Total items in localStorage:', parsedData.length);
+          console.log('Final check - Units count:', unitsCount);
+          
+          // Update allData
+          allData = parsedData;
+          
+          // Manually trigger dataHandler to ensure UI is updated
+          if (window.dataSdk && window.dataSdk.dataHandler && window.dataSdk.dataHandler.onDataChanged) {
+            console.log('Calling dataHandler.onDataChanged...');
+            window.dataSdk.dataHandler.onDataChanged(parsedData);
+          } else if (dataHandler && dataHandler.onDataChanged) {
+            console.log('Calling local dataHandler.onDataChanged...');
+            dataHandler.onDataChanged(parsedData);
+          } else {
+            console.warn('No dataHandler found!');
+            // Force update manually
+            updateDashboard();
+            renderUnits();
+          }
+        } catch (error) {
+          console.error('Error parsing stored data:', error);
+        }
+      } else {
+        console.warn('No data found in localStorage after import');
+      }
+      
+      // Additional delay then force update display
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Force update all displays
+      console.log('Force updating displays...');
+      updateDashboard();
+      renderUnits();
+      renderActiveTab();
+      
+      const message = `تم إضافة ${successCount} شقة بنجاح${failCount > 0 ? `، فشل إضافة ${failCount} شقة` : ''}`;
+      showToast(message);
+      console.log('Import completed:', message);
+      console.log(`Total units in system: ${allData.filter(d => d.type === 'unit').length}`);
     }
     
     function closeModal(modalId) {

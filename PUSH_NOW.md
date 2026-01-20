@@ -3,63 +3,50 @@
 ## ✅ الحالة الحالية / Current Status
 
 - ✅ جميع الملفات محفوظة محلياً
-- ✅ تم عمل 3 commits
-- ⏳ في انتظار إنشاء الـ repository على GitHub
+- ✅ المستودع موجود على GitHub
+- ✅ Custom Domain: rahaadmin.com
 
-## 📝 الخطوات السريعة / Quick Steps
+## 📝 معلومات المستودع / Repository Info:
 
-### 1. إنشاء Repository على GitHub
+- **Organization:** raha4rental
+- **Repository:** mangment
+- **Repository URL:** https://github.com/raha4rental/mangment
+- **GitHub Pages:** https://raha4rental.github.io/mangment/
+- **Custom Domain:** https://rahaadmin.com
 
-**الرابط المباشر:**
-```
-https://github.com/organizations/تنظيم/repositories/new
-```
+## 🚀 رفع التغييرات / Push Changes
 
-**أو:**
-```
-https://github.com/new
-```
-ثم اختر المنظمة "تنظيم" من القائمة المنسدلة
-
-### 2. إعدادات الـ Repository
-
-- **الاسم:** `mangment`
-- **الوصف:** نظام تشغيل الشقق / Apartment Management System
-- **Visibility:** Public أو Private
-- ❌ **لا تضع علامة** على "Add a README file"
-- ❌ **لا تضع علامة** على "Add .gitignore"
-- ❌ **لا تضع علامة** على "Choose a license"
-
-### 3. بعد الإنشاء - نفّذ هذا الأمر:
+### نفّذ هذا الأمر:
 
 ```bash
 cd /Users/allaasheikh/mangment
 git push -u origin main
 ```
 
-## 🎯 أو استخدم السكريبت:
+### أو استخدم السكريبت:
 
 ```bash
-./push-to-github.sh mangment
+./push-to-github.sh
 ```
 
-## 📊 Commits الجاهزة للرفع:
+## 📊 آخر Commits:
 
-1. `ba56a14` - Initial commit: Apartment Management System
-2. `b7418e7` - Add GitHub setup instructions and push script
-3. `4581abe` - Add delivery system with customer details, address, and booking integration
+يمكنك رؤية آخر الـ commits باستخدام:
+```bash
+git log --oneline -10
+```
 
 ## ⚠️ ملاحظات مهمة:
 
 - تأكد من أنك مسجل دخول على GitHub
-- تأكد من أن لديك صلاحيات في منظمة "تنظيم"
+- تأكد من أن لديك صلاحيات في منظمة "raha4rental"
 - إذا طُلب منك اسم المستخدم وكلمة المرور:
   - Username: اسم المستخدم على GitHub
   - Password: Personal Access Token (ليس كلمة المرور العادية)
 
 ## 🌐 بعد الرفع:
 
-- **Repository:** `https://github.com/تنظيم/mangment`
-- **لتفعيل GitHub Pages:** Settings → Pages → Branch: main → Save
-- **الموقع سيكون على:** `https://تنظيم.github.io/mangment/`
+- **Repository:** `https://github.com/raha4rental/mangment`
+- **GitHub Pages:** `https://raha4rental.github.io/mangment/`
+- **Custom Domain:** `https://rahaadmin.com`
 

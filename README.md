@@ -40,6 +40,12 @@ Then open http://localhost:8080 in your browser.
 - lumos
 - lumont
 
+## GitHub Repository / المستودع
+
+- **Repository:** [raha4rental/mangment](https://github.com/raha4rental/mangment)
+- **Live Site:** [rahaadmin.com](https://rahaadmin.com)
+- **GitHub Pages:** [raha4rental.github.io/mangment](https://raha4rental.github.io/mangment)
+
 ## الترخيص / License
 
 MIT License

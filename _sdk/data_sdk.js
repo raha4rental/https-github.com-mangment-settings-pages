@@ -1,18 +1,21 @@
 // Data SDK - Simple implementation for local storage
 window.dataSdk = {
+  dataHandler: null, // Store handler reference
+  
   async init(dataHandler) {
     try {
       // Load data from localStorage
       const storedData = localStorage.getItem('apartment_management_data');
       const data = storedData ? JSON.parse(storedData) : [];
       
+      // Store handler for updates
+      this.dataHandler = dataHandler;
+      window.dataSdk.dataHandler = dataHandler; // Also store on window for direct access
+      
       // Initialize data handler
       if (dataHandler && dataHandler.onDataChanged) {
         dataHandler.onDataChanged(data);
       }
-      
-      // Store handler for updates
-      this.dataHandler = dataHandler;
       
       return { isOk: true };
     } catch (error) {
@@ -32,9 +35,10 @@ window.dataSdk = {
       data.push(item);
       localStorage.setItem('apartment_management_data', JSON.stringify(data));
       
-      // Notify handler
-      if (this.dataHandler && this.dataHandler.onDataChanged) {
-        this.dataHandler.onDataChanged(data);
+      // Notify handler - try multiple ways to ensure it's called
+      const handler = this.dataHandler || window.dataSdk.dataHandler;
+      if (handler && handler.onDataChanged) {
+        handler.onDataChanged(data);
       }
       
       return { isOk: true, data: item };
@@ -55,8 +59,9 @@ window.dataSdk = {
         localStorage.setItem('apartment_management_data', JSON.stringify(data));
         
         // Notify handler
-        if (this.dataHandler && this.dataHandler.onDataChanged) {
-          this.dataHandler.onDataChanged(data);
+        const handler = this.dataHandler || window.dataSdk.dataHandler;
+        if (handler && handler.onDataChanged) {
+          handler.onDataChanged(data);
         }
         
         return { isOk: true, data: item };
@@ -78,8 +83,9 @@ window.dataSdk = {
       localStorage.setItem('apartment_management_data', JSON.stringify(filteredData));
       
       // Notify handler
-      if (this.dataHandler && this.dataHandler.onDataChanged) {
-        this.dataHandler.onDataChanged(filteredData);
+      const handler = this.dataHandler || window.dataSdk.dataHandler;
+      if (handler && handler.onDataChanged) {
+        handler.onDataChanged(filteredData);
       }
       
       return { isOk: true };

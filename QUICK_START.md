@@ -3,76 +3,58 @@
 ## ✅ تم إعداد المشروع محلياً
 **Project is ready locally!**
 
-## 📝 الخطوات التالية / Next Steps:
+## 📝 معلومات المستودع / Repository Info:
 
-### 1️⃣ إنشاء Repository على GitHub
-
-**اذهب إلى أحد الروابط التالية:**
-
-**Option A:** رابط مباشر للمنظمة
-```
-https://github.com/organizations/تنظيم/repositories/new
-```
-
-**Option B:** إنشاء جديد ثم اختيار المنظمة
-```
-https://github.com/new
-```
-ثم اختر المنظمة "تنظيم" من القائمة المنسدلة
+- **Organization:** raha4rental
+- **Repository:** mangment
+- **Repository URL:** https://github.com/raha4rental/mangment
+- **GitHub Pages:** https://raha4rental.github.io/mangment/
+- **Custom Domain:** https://rahaadmin.com
 
 ---
 
-### 2️⃣ إعداد الـ Repository
+## 🚀 رفع التغييرات / Push Changes
 
-- **اسم المشروع / Repository Name:** `mangment` (أو أي اسم تريده)
-- **الوصف / Description:** نظام تشغيل الشقق / Apartment Management System
-- **Visibility:** اختر Public أو Private
-- ❌ **لا تضع علامة** على "Add a README file"
-- ❌ **لا تضع علامة** على "Add .gitignore"
-- ❌ **لا تضع علامة** على "Choose a license"
-- ✅ اضغط **"Create repository"**
-
----
-
-### 3️⃣ رفع الملفات
-
-**بعد إنشاء الـ repository، نفّذ هذا الأمر:**
+### نفّذ هذا الأمر:
 
 ```bash
 cd /Users/allaasheikh/mangment
 git push -u origin main
 ```
 
-أو استخدم السكريبت:
+### أو استخدم السكريبت:
 ```bash
-./push-to-github.sh mangment
+./push-to-github.sh
 ```
 
 ---
 
-### 4️⃣ تفعيل GitHub Pages (اختياري)
+## 🌐 تفعيل GitHub Pages (إذا لم يكن مفعلاً)
 
 لنشر الموقع على الإنترنت:
 
-1. اذهب إلى: `https://github.com/تنظيم/mangment/settings/pages`
+1. اذهب إلى: `https://github.com/raha4rental/mangment/settings/pages`
 2. تحت "Source":
    - Branch: اختر `main`
    - Folder: اختر `/ (root)`
 3. اضغط **Save**
 4. انتظر دقيقة أو دقيقتين
-5. الموقع سيكون على: `https://تنظيم.github.io/mangment/`
+5. الموقع سيكون على:
+   - `https://raha4rental.github.io/mangment/`
+   - `https://rahaadmin.com` (Custom Domain)
 
 ---
 
 ## 📋 ملخص الأوامر / Command Summary
 
 ```bash
-# إذا كان الـ repository موجود بالفعل
+# رفع التغييرات
 cd /Users/allaasheikh/mangment
 git push -u origin main
 
-# إذا لم يكن الـ remote موجود
-git remote add origin https://github.com/تنظيم/mangment.git
+# إصلاح الـ remote (إذا لزم الأمر)
+git remote remove origin
+git remote add origin https://github.com/raha4rental/mangment.git
 git push -u origin main
 ```
 

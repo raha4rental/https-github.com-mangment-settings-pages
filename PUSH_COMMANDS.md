@@ -1,19 +1,24 @@
 # أوامر رفع المشروع / Push Commands
 
-## بعد إنشاء Repository على GitHub تحت منظمة "تنظيم":
+## معلومات المستودع / Repository Info:
+
+- **Organization:** raha4rental
+- **Repository:** mangment
+- **URL:** https://github.com/raha4rental/mangment
+
+---
+
+## رفع التغييرات / Push Changes
 
 ### الطريقة 1: استخدام السكريبت (الأسهل)
 ```bash
 cd /Users/allaasheikh/mangment
-./push-to-github.sh mangment
+./push-to-github.sh
 ```
 
 ### الطريقة 2: الأوامر المباشرة
 ```bash
 cd /Users/allaasheikh/mangment
-
-# ربط المشروع بـ GitHub
-git remote add origin https://github.com/تنظيم/mangment.git
 
 # التأكد من الفرع الرئيسي
 git branch -M main
@@ -22,17 +27,20 @@ git branch -M main
 git push -u origin main
 ```
 
-**ملاحظة:** استبدل `mangment` باسم الـ repository الفعلي الذي أنشأته على GitHub
-
 ---
 
-## إذا كان الـ Repository موجود بالفعل:
+## إصلاح الـ Remote (إذا لزم الأمر)
 
-يمكنك تنفيذ الأوامر مباشرة. إذا واجهت خطأ "remote already exists"، استخدم:
+إذا كان الـ remote غير صحيح، استخدم:
 
 ```bash
+# إزالة الـ remote الحالي
 git remote remove origin
-git remote add origin https://github.com/تنظيم/mangment.git
+
+# إضافة الـ remote الصحيح
+git remote add origin https://github.com/raha4rental/mangment.git
+
+# رفع الملفات
 git push -u origin main
 ```
 

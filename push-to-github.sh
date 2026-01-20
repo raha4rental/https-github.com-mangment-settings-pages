@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Script to push project to GitHub under "تنظيم" organization
-# Usage: ./push-to-github.sh REPO_NAME
+# Script to push project to GitHub under "raha4rental" organization
+# Usage: ./push-to-github.sh
 
-REPO_NAME=${1:-"mangment"}
-ORG_NAME="تنظيم"
+REPO_NAME="mangment"
+ORG_NAME="raha4rental"
 
 echo "🚀 رفع المشروع إلى GitHub..."
 echo "📦 اسم المشروع: $REPO_NAME"
@@ -38,13 +38,14 @@ git push -u origin main
 if [ $? -eq 0 ]; then
     echo ""
     echo "✅ تم الرفع بنجاح!"
-    echo "🌐 الموقع: https://github.com/$ORG_NAME/$REPO_NAME"
+    echo "🌐 Repository: https://github.com/$ORG_NAME/$REPO_NAME"
+    echo "🌐 GitHub Pages: https://$ORG_NAME.github.io/$REPO_NAME/"
+    echo "🌐 Custom Domain: https://rahaadmin.com"
     echo ""
-    echo "💡 لتفعيل GitHub Pages:"
+    echo "💡 لتفعيل GitHub Pages (إذا لم يكن مفعلاً):"
     echo "   1. اذهب إلى: https://github.com/$ORG_NAME/$REPO_NAME/settings/pages"
     echo "   2. اختر Branch: main و Folder: / (root)"
     echo "   3. اضغط Save"
-    echo "   4. الموقع سيكون على: https://$ORG_NAME.github.io/$REPO_NAME/"
 else
     echo ""
     echo "❌ فشل الرفع. تأكد من:"

@@ -1,30 +1,20 @@
 # 🚀 ابدأ من هنا / START HERE
 
-## ⚡ خطوات سريعة للبدء / Quick Start Steps
+## ⚡ معلومات المستودع / Repository Info
 
-### الخطوة 1: إنشاء Repository على GitHub
-
-**تم فتح صفحة إنشاء الـ repository في المتصفح**
-
-إذا لم تفتح تلقائياً، اذهب إلى:
-```
-https://github.com/organizations/تنظيم/repositories/new
-```
-
-**الإعدادات:**
-- ✅ الاسم: `mangment` (يجب أن يكون موجوداً بالفعل)
-- ✅ الوصف: نظام تشغيل الشقق / Apartment Management System
-- ✅ اختر Public أو Private
-- ❌ **لا تضع علامة** على "Add a README file"
-- ❌ **لا تضع علامة** على "Add .gitignore"  
-- ❌ **لا تضع علامة** على "Choose a license"
-- ✅ اضغط **"Create repository"**
+- **Organization:** raha4rental
+- **Repository:** mangment
+- **Repository URL:** https://github.com/raha4rental/mangment
+- **GitHub Pages:** https://raha4rental.github.io/mangment/
+- **Custom Domain:** https://rahaadmin.com
 
 ---
 
-### الخطوة 2: رفع المشروع
+## ⚡ رفع التغييرات / Push Changes
 
-**بعد إنشاء الـ repository، نفّذ هذا الأمر في Terminal:**
+### الخطوة 1: رفع المشروع
+
+**نفّذ هذا الأمر في Terminal:**
 
 ```bash
 cd /Users/allaasheikh/mangment
@@ -33,20 +23,22 @@ git push -u origin main
 
 **أو استخدم السكريبت:**
 ```bash
-./push-to-github.sh mangment
+./push-to-github.sh
 ```
 
 ---
 
-### الخطوة 3: تفعيل GitHub Pages (لنشر الموقع)
+### الخطوة 2: تفعيل GitHub Pages (لنشر الموقع)
 
-1. اذهب إلى: `https://github.com/تنظيم/mangment/settings/pages`
+1. اذهب إلى: `https://github.com/raha4rental/mangment/settings/pages`
 2. تحت "Source":
    - Branch: اختر `main`
    - Folder: اختر `/ (root)`
 3. اضغط **Save**
 4. انتظر 1-2 دقيقة
-5. الموقع سيكون على: `https://تنظيم.github.io/mangment/`
+5. الموقع سيكون على:
+   - `https://raha4rental.github.io/mangment/`
+   - `https://rahaadmin.com` (Custom Domain)
 
 ---
 
@@ -78,6 +70,7 @@ python3 -m http.server 8080
 ## 📞 إذا واجهت مشكلة
 
 - تأكد من أنك مسجل دخول على GitHub
-- تأكد من أن لديك صلاحيات في منظمة "تنظيم"
+- تأكد من أن لديك صلاحيات في منظمة "raha4rental"
 - إذا طُلب اسم المستخدم وكلمة المرور، استخدم Personal Access Token
+- للتحقق من الـ remote الحالي: `git remote -v`
 

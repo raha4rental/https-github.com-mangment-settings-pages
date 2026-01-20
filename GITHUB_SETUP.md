@@ -1,13 +1,13 @@
 # تعليمات رفع المشروع على GitHub / GitHub Upload Instructions
 
-## رفع المشروع تحت منظمة "تنظيم" / Upload under "تنظيم" organization
+## رفع المشروع تحت منظمة "raha4rental" / Upload under "raha4rental" organization
 
 ### 1. إنشاء Repository جديد على GitHub
 **Create a new repository on GitHub:**
 
-1. اذهب إلى https://github.com/organizations/تنظيم/repositories/new
-   أو https://github.com/new (ثم اختر المنظمة "تنظيم")
-2. أدخل اسم المشروع (مثلاً: `mangment` أو `apartment-management`)
+1. اذهب إلى https://github.com/organizations/raha4rental/repositories/new
+   أو https://github.com/new (ثم اختر المنظمة "raha4rental")
+2. أدخل اسم المشروع: `mangment`
 3. اختر Public أو Private
 4. **لا** تضع علامة على "Initialize this repository with a README"
 5. اضغط "Create repository"
@@ -19,36 +19,44 @@
 
 ```bash
 cd /Users/allaasheikh/mangment
-git remote add origin https://github.com/تنظيم/YOUR_REPO_NAME.git
+git remote add origin https://github.com/raha4rental/mangment.git
 git branch -M main
 git push -u origin main
 ```
-
-استبدل `YOUR_REPO_NAME` باسم الـ repository الذي أنشأته
 
 ### 3. مثال كامل / Full Example:
 
 ```bash
-# إذا كان اسم المشروع: mangment
-git remote add origin https://github.com/تنظيم/mangment.git
+# ربط المشروع بـ GitHub
+git remote add origin https://github.com/raha4rental/mangment.git
 git branch -M main
 git push -u origin main
 ```
 
-### 4. نشر الموقع على GitHub Pages (اختياري)
-**Publish website on GitHub Pages (Optional):**
+### 4. نشر الموقع على GitHub Pages
+**Publish website on GitHub Pages:**
 
-1. اذهب إلى Settings في الـ repository
+1. اذهب إلى Settings في الـ repository: https://github.com/raha4rental/mangment/settings/pages
 2. اضغط على "Pages" من القائمة الجانبية
 3. اختر Branch: `main` و Folder: `/ (root)`
 4. اضغط Save
-5. الموقع سيكون متاح على: `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+5. الموقع سيكون متاح على: `https://raha4rental.github.io/mangment/`
+6. مع النطاق المخصص: `https://rahaadmin.com`
 
 ---
+
+## معلومات المستودع الحالي / Current Repository Info:
+
+- **Organization:** raha4rental
+- **Repository:** mangment
+- **Repository URL:** https://github.com/raha4rental/mangment
+- **GitHub Pages:** https://raha4rental.github.io/mangment/
+- **Custom Domain:** https://rahaadmin.com
 
 ## ملاحظات / Notes:
 
 - تأكد من أنك مسجل دخول على GitHub
 - قد يُطلب منك إدخال اسم المستخدم وكلمة المرور عند الـ push
 - إذا استخدمت Two-Factor Authentication، ستحتاج Personal Access Token بدلاً من كلمة المرور
+- المشروع يستخدم نطاق مخصص (CNAME): rahaadmin.com
 
