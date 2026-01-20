@@ -34,11 +34,11 @@ Then open http://localhost:8000 in your browser.
 
 ## المواقع المدعومة / Supported Locations
 
-- Lamont
-- Sky
-- Vantage – 1
-- Lumont
-- Vantage – 2
+- aster
+- vantage
+- sky
+- lumos
+- lumont
 
 ## الترخيص / License
 
