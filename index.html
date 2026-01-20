@@ -933,6 +933,10 @@
       const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
       if (isAuthenticated) {
         showApp();
+        // Initialize the app after showing it
+        setTimeout(() => {
+          init();
+        }, 100);
       } else {
         showLogin();
       }
@@ -948,6 +952,10 @@
     function showApp() {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
+      // Setup tabs immediately after showing app
+      setTimeout(() => {
+        setupTabs();
+      }, 100);
     }
     
     // Handle login form submission
@@ -1221,35 +1229,93 @@
         });
       }
       
-      setupTabs();
-      updateDashboard();
+      // Wait for DOM to be fully ready before setting up tabs
+      // Note: setupTabs() should be called from showApp() to ensure app is visible first
+      setTimeout(() => {
+        // If app is already shown, setup tabs here too (in case showApp was called before)
+        if (document.getElementById('app').style.display !== 'none') {
+          setupTabs();
+        }
+        updateDashboard();
+      }, 300);
     }
     
+    // Use event delegation on the navigation element instead of individual buttons
+    let tabsSetup = false;
+    
     function setupTabs() {
-      const tabButtons = document.querySelectorAll('.tab-button');
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          tabButtons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.color = '#6b7280';
-            btn.style.borderBottomColor = 'transparent';
-          });
-          
-          button.classList.add('active');
-          button.style.color = '#3b82f6';
-          button.style.borderBottomColor = '#3b82f6';
-          
-          const tabContents = document.querySelectorAll('.tab-content');
-          tabContents.forEach(content => content.style.display = 'none');
-          
-          const tabId = button.dataset.tab + '-tab';
-          const activeTab = document.getElementById(tabId);
-          if (activeTab) {
-            activeTab.style.display = 'block';
-            renderActiveTab();
-          }
+      const nav = document.querySelector('nav');
+      if (!nav) {
+        console.warn('Nav element not found, retrying...');
+        setTimeout(setupTabs, 100);
+        return;
+      }
+      
+      // Only setup once
+      if (tabsSetup) {
+        console.log('Tabs already setup');
+        return;
+      }
+      
+      // Use event delegation - listen on nav element instead of individual buttons
+      nav.addEventListener('click', function(e) {
+        // Check if clicked element is a tab button or inside one
+        let button = e.target;
+        while (button && !button.classList.contains('tab-button')) {
+          button = button.parentElement;
+        }
+        
+        if (!button || !button.classList.contains('tab-button')) {
+          return; // Not a tab button click
+        }
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const tabName = button.dataset.tab;
+        console.log('Tab clicked:', tabName);
+        
+        if (!tabName) {
+          console.error('No tab name in button');
+          return;
+        }
+        
+        // Get all tab buttons
+        const allTabButtons = document.querySelectorAll('.tab-button');
+        
+        // Remove active class from all buttons
+        allTabButtons.forEach(btn => {
+          btn.classList.remove('active');
+          btn.style.color = '#6b7280';
+          btn.style.borderBottomColor = 'transparent';
         });
+        
+        // Add active class to clicked button
+        button.classList.add('active');
+        button.style.color = '#3b82f6';
+        button.style.borderBottomColor = '#3b82f6';
+        
+        // Hide all tab contents
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabContents.forEach(content => {
+          content.style.display = 'none';
+        });
+        
+        // Show the selected tab content
+        const tabId = tabName + '-tab';
+        console.log('Looking for tab content:', tabId);
+        const activeTab = document.getElementById(tabId);
+        if (activeTab) {
+          activeTab.style.display = 'block';
+          console.log('Tab content found and displayed:', tabId);
+          renderActiveTab();
+        } else {
+          console.error('Tab content not found:', tabId);
+        }
       });
+      
+      tabsSetup = true;
+      console.log('Tabs setup completed using event delegation');
     }
     
     function renderActiveTab() {
