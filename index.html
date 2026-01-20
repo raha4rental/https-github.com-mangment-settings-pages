@@ -263,7 +263,7 @@
     <button onclick="handleLogout()" class="btn-secondary" style="padding: 0.75rem 1.5rem; font-size: 0.875rem; cursor: pointer;">تسجيل الخروج</button>
    </header><!-- Navigation Tabs -->
    <nav style="background: white; padding: 0 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap;"><button class="tab-button active" data-tab="dashboard" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" style="color: #6b7280;"> المستلزمات </button> <button class="tab-button" data-tab="maintenance" style="color: #6b7280;"> الصيانة </button> <button class="tab-button" data-tab="invoices" style="color: #6b7280;"> الفواتير </button> <button class="tab-button" data-tab="pos" style="color: #6b7280;"> 💳 الدفعات </button>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;"><button class="tab-button active" data-tab="dashboard" onclick="switchTab('dashboard'); return false;" style="color: #3b82f6;"> لوحة التحكم </button> <button class="tab-button" data-tab="bookings" onclick="switchTab('bookings'); return false;" style="color: #6b7280;"> الحجوزات </button> <button class="tab-button" data-tab="delivery" onclick="switchTab('delivery'); return false;" style="color: #6b7280;"> التوصيل </button> <button class="tab-button" data-tab="units" onclick="switchTab('units'); return false;" style="color: #6b7280;"> الشقق </button> <button class="tab-button" data-tab="cleaning" onclick="switchTab('cleaning'); return false;" style="color: #6b7280;"> التنظيف </button> <button class="tab-button" data-tab="inspection" onclick="switchTab('inspection'); return false;" style="color: #6b7280;"> التفتيش </button> <button class="tab-button" data-tab="inventory" onclick="switchTab('inventory'); return false;" style="color: #6b7280;"> المستلزمات </button> <button class="tab-button" data-tab="maintenance" onclick="switchTab('maintenance'); return false;" style="color: #6b7280;"> الصيانة </button> <button class="tab-button" data-tab="invoices" onclick="switchTab('invoices'); return false;" style="color: #6b7280;"> الفواتير </button> <button class="tab-button" data-tab="pos" onclick="switchTab('pos'); return false;" style="color: #6b7280;"> 💳 الدفعات </button>
     </div>
    </nav><!-- Main Content -->
    <main style="padding: 2rem; max-width: 1400px; margin: 0 auto;"><!-- Dashboard Tab -->
@@ -1240,7 +1240,52 @@
       }, 300);
     }
     
-    // Use event delegation on the navigation element instead of individual buttons
+    // Tab switching function - called directly from button clicks
+    function switchTab(tabName) {
+      if (!tabName) {
+        console.error('No tab name provided');
+        return;
+      }
+      
+      console.log('Switching to tab:', tabName);
+      
+      // Get all tab buttons
+      const allTabButtons = document.querySelectorAll('.tab-button');
+      
+      // Remove active class from all buttons
+      allTabButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.color = '#6b7280';
+        btn.style.borderBottomColor = 'transparent';
+      });
+      
+      // Add active class to clicked button
+      const clickedButton = Array.from(allTabButtons).find(btn => btn.dataset.tab === tabName);
+      if (clickedButton) {
+        clickedButton.classList.add('active');
+        clickedButton.style.color = '#3b82f6';
+        clickedButton.style.borderBottomColor = '#3b82f6';
+      }
+      
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => {
+        content.style.display = 'none';
+      });
+      
+      // Show the selected tab content
+      const tabId = tabName + '-tab';
+      const activeTab = document.getElementById(tabId);
+      if (activeTab) {
+        activeTab.style.display = 'block';
+        console.log('Tab content displayed:', tabId);
+        renderActiveTab();
+      } else {
+        console.error('Tab content not found:', tabId);
+      }
+    }
+    
+    // Use event delegation on the navigation element
     let tabsSetup = false;
     
     function setupTabs() {
@@ -1257,11 +1302,11 @@
         return;
       }
       
-      // Use event delegation - listen on nav element instead of individual buttons
+      // Use event delegation - listen on nav element
       nav.addEventListener('click', function(e) {
         // Check if clicked element is a tab button or inside one
         let button = e.target;
-        while (button && !button.classList.contains('tab-button')) {
+        while (button && button !== nav && !button.classList.contains('tab-button')) {
           button = button.parentElement;
         }
         
@@ -1273,49 +1318,29 @@
         e.stopPropagation();
         
         const tabName = button.dataset.tab;
-        console.log('Tab clicked:', tabName);
-        
-        if (!tabName) {
-          console.error('No tab name in button');
-          return;
+        if (tabName) {
+          switchTab(tabName);
         }
-        
-        // Get all tab buttons
-        const allTabButtons = document.querySelectorAll('.tab-button');
-        
-        // Remove active class from all buttons
-        allTabButtons.forEach(btn => {
-          btn.classList.remove('active');
-          btn.style.color = '#6b7280';
-          btn.style.borderBottomColor = 'transparent';
-        });
-        
-        // Add active class to clicked button
-        button.classList.add('active');
-        button.style.color = '#3b82f6';
-        button.style.borderBottomColor = '#3b82f6';
-        
-        // Hide all tab contents
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(content => {
-          content.style.display = 'none';
-        });
-        
-        // Show the selected tab content
-        const tabId = tabName + '-tab';
-        console.log('Looking for tab content:', tabId);
-        const activeTab = document.getElementById(tabId);
-        if (activeTab) {
-          activeTab.style.display = 'block';
-          console.log('Tab content found and displayed:', tabId);
-          renderActiveTab();
-        } else {
-          console.error('Tab content not found:', tabId);
+      });
+      
+      // Also add onclick handlers directly to buttons as backup
+      const tabButtons = document.querySelectorAll('.tab-button');
+      tabButtons.forEach(button => {
+        const tabName = button.dataset.tab;
+        if (tabName) {
+          // Remove any existing onclick
+          button.onclick = null;
+          // Add new onclick
+          button.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            switchTab(tabName);
+          };
         }
       });
       
       tabsSetup = true;
-      console.log('Tabs setup completed using event delegation');
+      console.log('Tabs setup completed. Found', tabButtons.length, 'tab buttons');
     }
     
     function renderActiveTab() {
