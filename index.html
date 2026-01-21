@@ -2479,28 +2479,62 @@
       submitBtn.textContent = 'حفظ';
       
       if (result && result.isOk === true) {
+        console.log('✅ Unit saved successfully. Refreshing data...');
+        
+        // Force refresh data immediately
+        const storedData = localStorage.getItem('apartment_management_data');
+        console.log('Stored data length:', storedData ? storedData.length : 0);
+        
+        if (storedData) {
+          try {
+            const parsedData = JSON.parse(storedData);
+            console.log('Parsed data items:', parsedData.length);
+            allData = parsedData;
+            
+            // Update via handler
+            if (window.dataSdk && window.dataSdk.dataHandler && typeof window.dataSdk.dataHandler.onDataChanged === 'function') {
+              console.log('Calling dataHandler.onDataChanged...');
+              window.dataSdk.dataHandler.onDataChanged(allData);
+            } else {
+              console.warn('dataHandler not available, manually updating...');
+              // Manual update
+              updateDashboard();
+              renderUnits();
+            }
+          } catch (parseError) {
+            console.error('Error parsing data after save:', parseError);
+            // Still update manually
+            updateDashboard();
+            renderUnits();
+          }
+        } else {
+          console.warn('No stored data found after save!');
+          // Still try to update
+          updateDashboard();
+          renderUnits();
+        }
+        
         showToast(currentEditUnit ? '✅ تم تحديث الشقة بنجاح' : '✅ تم إضافة الشقة بنجاح');
         closeModal('unit-modal');
         form.reset();
         unitIdImageBase64 = null;
-        document.getElementById('unit-id-image-preview').style.display = 'none';
+        if (document.getElementById('unit-id-image-preview')) {
+          document.getElementById('unit-id-image-preview').style.display = 'none';
+        }
         currentEditUnit = null;
         
-        // Force refresh data
-        const storedData = localStorage.getItem('apartment_management_data');
-        if (storedData) {
-          allData = JSON.parse(storedData);
-          if (window.dataSdk && window.dataSdk.dataHandler && window.dataSdk.dataHandler.onDataChanged) {
-            window.dataSdk.dataHandler.onDataChanged(allData);
+        // Final verification
+        setTimeout(() => {
+          const finalCheck = localStorage.getItem('apartment_management_data');
+          if (finalCheck) {
+            const finalData = JSON.parse(finalCheck);
+            const unitsCount = finalData.filter(d => d.type === 'unit').length;
+            console.log('Final verification - Total units in localStorage:', unitsCount);
           }
-        }
-        
-        // Update display
-        updateDashboard();
-        renderUnits();
+        }, 500);
       } else {
         const errorMsg = result?.error || result?.message || 'Unknown error';
-        console.error('Failed to save unit. Result:', result);
+        console.error('❌ Failed to save unit. Result:', result);
         showToast(`❌ فشل حفظ الشقة: ${errorMsg}`);
       }
     }

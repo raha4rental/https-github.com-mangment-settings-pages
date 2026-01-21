@@ -77,9 +77,26 @@ window.dataSdk = {
       data.push(item);
       
       try {
-        localStorage.setItem('apartment_management_data', JSON.stringify(data));
+        const jsonString = JSON.stringify(data);
+        localStorage.setItem('apartment_management_data', jsonString);
+        console.log('✅ Saved to localStorage successfully. Total items:', data.length);
+        
+        // Verify it was saved
+        const verifyData = localStorage.getItem('apartment_management_data');
+        if (!verifyData || verifyData !== jsonString) {
+          console.error('❌ Verification failed: Data was not saved correctly');
+          return { isOk: false, error: 'Data verification failed' };
+        }
       } catch (storageError) {
-        console.error('Error saving to localStorage:', storageError);
+        console.error('❌ Error saving to localStorage:', storageError);
+        console.error('Error name:', storageError.name);
+        console.error('Error message:', storageError.message);
+        
+        // Check if it's a quota exceeded error
+        if (storageError.name === 'QuotaExceededError') {
+          return { isOk: false, error: 'LocalStorage is full. Please clear some data.' };
+        }
+        
         return { isOk: false, error: storageError.message || 'Storage error' };
       }
       
