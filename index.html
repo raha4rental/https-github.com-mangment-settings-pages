@@ -2613,9 +2613,12 @@
       submitBtn.textContent = 'حفظ';
       
       if (result && result.isOk === true) {
-        console.log('✅ Unit saved successfully. Refreshing data...');
+        console.log('✅ Unit saved successfully via SDK. Refreshing data...');
         
-        // Force refresh data immediately
+        // Wait a bit for SDK to complete the save
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Force refresh data immediately from localStorage
         const storedData = localStorage.getItem('apartment_management_data');
         console.log('Stored data length:', storedData ? storedData.length : 0);
         
@@ -2623,12 +2626,23 @@
           try {
             const parsedData = JSON.parse(storedData);
             console.log('Parsed data items:', parsedData.length);
+            const unitsCount = parsedData.filter(d => d.type === 'unit').length;
+            console.log('Total units in storage:', unitsCount);
+            
+            // Update allData
             allData = parsedData;
             
-            // Update via handler
+            // Update via handler (SDK should have already called this, but ensure it)
             if (window.dataSdk && window.dataSdk.dataHandler && typeof window.dataSdk.dataHandler.onDataChanged === 'function') {
-              console.log('Calling dataHandler.onDataChanged...');
-              window.dataSdk.dataHandler.onDataChanged(allData);
+              console.log('Calling dataHandler.onDataChanged to refresh UI...');
+              try {
+                window.dataSdk.dataHandler.onDataChanged(parsedData);
+              } catch (handlerError) {
+                console.error('Error calling handler:', handlerError);
+                // Fallback to manual update
+                updateDashboard();
+                renderUnits();
+              }
             } else {
               console.warn('dataHandler not available, manually updating...');
               // Manual update
@@ -2642,8 +2656,8 @@
             renderUnits();
           }
         } else {
-          console.warn('No stored data found after save!');
-          // Still try to update
+          console.warn('⚠️ No stored data found after save! This should not happen.');
+          // Still try to update - maybe data was saved but not yet visible
           updateDashboard();
           renderUnits();
         }
@@ -2657,18 +2671,36 @@
         }
         currentEditUnit = null;
         
-        // Final verification
+        // Final verification after a delay
         setTimeout(() => {
           const finalCheck = localStorage.getItem('apartment_management_data');
           if (finalCheck) {
-            const finalData = JSON.parse(finalCheck);
-            const unitsCount = finalData.filter(d => d.type === 'unit').length;
-            console.log('Final verification - Total units in localStorage:', unitsCount);
+            try {
+              const finalData = JSON.parse(finalCheck);
+              const unitsCount = finalData.filter(d => d.type === 'unit').length;
+              console.log('✅ Final verification - Total units in localStorage:', unitsCount);
+              
+              // Verify the new unit is in the data
+              if (!currentEditUnit) { // Only check if it's a new unit
+                const newUnit = finalData.find(d => 
+                  d.type === 'unit' && 
+                  d.location === unitData.location && 
+                  d.unit_number === unitData.unit_number
+                );
+                if (newUnit) {
+                  console.log('✅ New unit found in storage:', newUnit.__backendId);
+                } else {
+                  console.warn('⚠️ New unit not found in storage after save!');
+                }
+              }
+            } catch (e) {
+              console.error('Error in final verification:', e);
+            }
           }
         }, 500);
       } else {
         const errorMsg = result?.error || result?.message || 'Unknown error';
-        console.error('❌ Failed to save unit. Result:', result);
+        console.error('❌ Failed to save unit via SDK. Result:', result);
         showToast(`❌ فشل حفظ الشقة: ${errorMsg}`);
       }
     }
