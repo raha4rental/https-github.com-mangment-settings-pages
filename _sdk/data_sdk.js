@@ -5,45 +5,98 @@ window.dataSdk = {
   async init(dataHandler) {
     try {
       // Load data from localStorage
+      let data = [];
       const storedData = localStorage.getItem('apartment_management_data');
-      const data = storedData ? JSON.parse(storedData) : [];
+      
+      if (storedData) {
+        try {
+          data = JSON.parse(storedData);
+          // Ensure data is an array
+          if (!Array.isArray(data)) {
+            console.warn('Data is not an array, resetting to empty array');
+            data = [];
+            localStorage.setItem('apartment_management_data', JSON.stringify([]));
+          }
+        } catch (parseError) {
+          console.error('Error parsing stored data:', parseError);
+          console.error('Corrupted data:', storedData);
+          // Reset corrupted data
+          data = [];
+          localStorage.setItem('apartment_management_data', JSON.stringify([]));
+        }
+      }
       
       // Store handler for updates
-      this.dataHandler = dataHandler;
-      window.dataSdk.dataHandler = dataHandler; // Also store on window for direct access
+      if (dataHandler) {
+        this.dataHandler = dataHandler;
+        window.dataSdk.dataHandler = dataHandler; // Also store on window for direct access
+      }
       
       // Initialize data handler
-      if (dataHandler && dataHandler.onDataChanged) {
-        dataHandler.onDataChanged(data);
+      if (dataHandler && typeof dataHandler.onDataChanged === 'function') {
+        try {
+          dataHandler.onDataChanged(data);
+        } catch (handlerError) {
+          console.error('Error calling dataHandler.onDataChanged:', handlerError);
+        }
       }
       
       return { isOk: true };
     } catch (error) {
       console.error('Data SDK init error:', error);
+      console.error('Error stack:', error.stack);
       return { isOk: false, error: error.message };
     }
   },
   
   async create(item) {
     try {
+      // Validate item
+      if (!item || typeof item !== 'object') {
+        return { isOk: false, error: 'Invalid item: must be an object' };
+      }
+      
+      let data = [];
       const storedData = localStorage.getItem('apartment_management_data');
-      const data = storedData ? JSON.parse(storedData) : [];
+      
+      if (storedData) {
+        try {
+          data = JSON.parse(storedData);
+          if (!Array.isArray(data)) {
+            data = [];
+          }
+        } catch (parseError) {
+          console.error('Error parsing stored data in create:', parseError);
+          data = [];
+        }
+      }
       
       // Generate unique ID
       item.__backendId = 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
       
       data.push(item);
-      localStorage.setItem('apartment_management_data', JSON.stringify(data));
+      
+      try {
+        localStorage.setItem('apartment_management_data', JSON.stringify(data));
+      } catch (storageError) {
+        console.error('Error saving to localStorage:', storageError);
+        return { isOk: false, error: storageError.message || 'Storage error' };
+      }
       
       // Notify handler - try multiple ways to ensure it's called
       const handler = this.dataHandler || window.dataSdk.dataHandler;
-      if (handler && handler.onDataChanged) {
-        handler.onDataChanged(data);
+      if (handler && typeof handler.onDataChanged === 'function') {
+        try {
+          handler.onDataChanged(data);
+        } catch (handlerError) {
+          console.error('Error calling handler.onDataChanged:', handlerError);
+        }
       }
       
       return { isOk: true, data: item };
     } catch (error) {
       console.error('Data SDK create error:', error);
+      console.error('Error stack:', error.stack);
       return { isOk: false, error: error.message };
     }
   },
