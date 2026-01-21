@@ -2215,10 +2215,29 @@
       renderUnits();
       renderActiveTab();
       
-      const message = `تم إضافة ${successCount} شقة بنجاح${failCount > 0 ? `، فشل إضافة ${failCount} شقة` : ''}`;
+      // Final message based on results
+      let message = '';
+      if (successCount > 0 && failCount === 0) {
+        message = `✅ تم إضافة ${successCount} شقة بنجاح`;
+      } else if (successCount > 0 && failCount > 0) {
+        message = `⚠️ تم إضافة ${successCount} شقة بنجاح، فشل إضافة ${failCount} شقة`;
+      } else if (successCount === 0 && failCount > 0) {
+        message = `❌ فشل إضافة جميع الشقق (${failCount} شقة)`;
+      } else {
+        message = `⚠️ لم يتم إضافة أي شقة`;
+      }
+      
       showToast(message);
-      console.log('Import completed:', message);
+      console.log('=== IMPORT COMPLETED ===');
+      console.log('Import result:', message);
+      console.log('Success:', successCount, 'Failed:', failCount);
       console.log(`Total units in system: ${allData.filter(d => d.type === 'unit').length}`);
+      
+      // If all failed, show detailed error
+      if (successCount === 0 && failCount > 0) {
+        console.error('All imports failed! Check console for details.');
+        alert('فشل الاستيراد! الرجاء فتح Developer Console (F12) لمعرفة التفاصيل.');
+      }
     }
     
     function closeModal(modalId) {
