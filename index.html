@@ -2440,26 +2440,68 @@
         timestamp: new Date().toISOString()
       };
       
+      // Verify dataSdk is available
+      if (!window.dataSdk) {
+        console.error('window.dataSdk is not defined!');
+        showToast('خطأ: نظام البيانات غير متاح');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'حفظ';
+        return;
+      }
+      
       let result;
-      if (currentEditUnit) {
-        unitData.__backendId = currentEditUnit.__backendId;
-        result = await window.dataSdk.update(unitData);
-      } else {
-        result = await window.dataSdk.create(unitData);
+      try {
+        if (currentEditUnit) {
+          unitData.__backendId = currentEditUnit.__backendId;
+          console.log('Updating unit:', unitData);
+          if (typeof window.dataSdk.update !== 'function') {
+            throw new Error('window.dataSdk.update is not a function');
+          }
+          result = await window.dataSdk.update(unitData);
+        } else {
+          console.log('Creating new unit:', unitData);
+          if (typeof window.dataSdk.create !== 'function') {
+            throw new Error('window.dataSdk.create is not a function');
+          }
+          result = await window.dataSdk.create(unitData);
+        }
+        
+        console.log('Save result:', result);
+      } catch (error) {
+        console.error('Error saving unit:', error);
+        showToast(`خطأ في الحفظ: ${error.message || error}`);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'حفظ';
+        return;
       }
       
       submitBtn.disabled = false;
       submitBtn.textContent = 'حفظ';
       
-      if (result.isOk) {
-        showToast(currentEditUnit ? 'تم تحديث الشقة بنجاح' : 'تم إضافة الشقة بنجاح');
+      if (result && result.isOk === true) {
+        showToast(currentEditUnit ? '✅ تم تحديث الشقة بنجاح' : '✅ تم إضافة الشقة بنجاح');
         closeModal('unit-modal');
         form.reset();
         unitIdImageBase64 = null;
         document.getElementById('unit-id-image-preview').style.display = 'none';
         currentEditUnit = null;
+        
+        // Force refresh data
+        const storedData = localStorage.getItem('apartment_management_data');
+        if (storedData) {
+          allData = JSON.parse(storedData);
+          if (window.dataSdk && window.dataSdk.dataHandler && window.dataSdk.dataHandler.onDataChanged) {
+            window.dataSdk.dataHandler.onDataChanged(allData);
+          }
+        }
+        
+        // Update display
+        updateDashboard();
+        renderUnits();
       } else {
-        showToast('فشل حفظ الشقة');
+        const errorMsg = result?.error || result?.message || 'Unknown error';
+        console.error('Failed to save unit. Result:', result);
+        showToast(`❌ فشل حفظ الشقة: ${errorMsg}`);
       }
     }
     
