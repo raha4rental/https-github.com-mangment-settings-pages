@@ -2150,17 +2150,27 @@
       for (let i = 0; i < unitsToAdd.length; i++) {
         const unitData = unitsToAdd[i];
         try {
+          // Verify dataSdk is available
+          if (!window.dataSdk || typeof window.dataSdk.create !== 'function') {
+            console.error('dataSdk.create is not available!');
+            showToast('خطأ: نظام البيانات غير متاح');
+            return;
+          }
+          
           const result = await window.dataSdk.create(unitData);
-          if (result.isOk) {
+          
+          if (result && result.isOk) {
             successCount++;
             console.log(`✓ [${i+1}/${unitsToAdd.length}] Added: ${unitData.location}-${unitData.unit_number}`);
           } else {
             failCount++;
-            console.error(`✗ [${i+1}/${unitsToAdd.length}] Failed: ${unitData.location}-${unitData.unit_number}`, result.error);
+            const errorMsg = result?.error || 'Unknown error';
+            console.error(`✗ [${i+1}/${unitsToAdd.length}] Failed: ${unitData.location}-${unitData.unit_number}`, errorMsg);
           }
         } catch (error) {
           failCount++;
           console.error(`✗ [${i+1}/${unitsToAdd.length}] Exception: ${unitData.location}-${unitData.unit_number}`, error);
+          console.error('Error details:', error.message, error.stack);
         }
         
         // Small delay to prevent overwhelming the system
