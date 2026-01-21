@@ -2151,26 +2151,42 @@
         const unitData = unitsToAdd[i];
         try {
           // Verify dataSdk is available
-          if (!window.dataSdk || typeof window.dataSdk.create !== 'function') {
-            console.error('dataSdk.create is not available!');
-            showToast('خطأ: نظام البيانات غير متاح');
-            return;
+          if (!window.dataSdk) {
+            console.error('window.dataSdk is not defined!');
+            showToast('خطأ: نظام البيانات غير متاح (dataSdk)');
+            failCount++;
+            continue;
           }
           
+          if (typeof window.dataSdk.create !== 'function') {
+            console.error('window.dataSdk.create is not a function!', typeof window.dataSdk.create);
+            showToast('خطأ: دالة الإضافة غير متاحة');
+            failCount++;
+            continue;
+          }
+          
+          console.log(`Attempting to create: ${unitData.location}-${unitData.unit_number}`);
           const result = await window.dataSdk.create(unitData);
           
-          if (result && result.isOk) {
+          console.log('Result:', result);
+          
+          if (result && result.isOk === true) {
             successCount++;
             console.log(`✓ [${i+1}/${unitsToAdd.length}] Added: ${unitData.location}-${unitData.unit_number}`);
           } else {
             failCount++;
-            const errorMsg = result?.error || 'Unknown error';
-            console.error(`✗ [${i+1}/${unitsToAdd.length}] Failed: ${unitData.location}-${unitData.unit_number}`, errorMsg);
+            const errorMsg = result?.error || result?.message || 'Unknown error';
+            console.error(`✗ [${i+1}/${unitsToAdd.length}] Failed: ${unitData.location}-${unitData.unit_number}`);
+            console.error('Error details:', errorMsg);
+            console.error('Full result:', JSON.stringify(result, null, 2));
           }
         } catch (error) {
           failCount++;
-          console.error(`✗ [${i+1}/${unitsToAdd.length}] Exception: ${unitData.location}-${unitData.unit_number}`, error);
-          console.error('Error details:', error.message, error.stack);
+          console.error(`✗ [${i+1}/${unitsToAdd.length}] Exception: ${unitData.location}-${unitData.unit_number}`);
+          console.error('Error type:', error.name);
+          console.error('Error message:', error.message);
+          console.error('Error stack:', error.stack);
+          console.error('Full error:', error);
         }
         
         // Small delay to prevent overwhelming the system
