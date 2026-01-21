@@ -8,6 +8,140 @@
   <meta http-equiv="Expires" content="0">
   <title>نظام تشغيل الشقق</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Initialize dataSdk immediately to ensure it's available
+    window.dataSdk = window.dataSdk || {
+      dataHandler: null,
+      init: async function(dataHandler) {
+        try {
+          let data = [];
+          const storedData = localStorage.getItem('apartment_management_data');
+          if (storedData) {
+            try {
+              data = JSON.parse(storedData);
+              if (!Array.isArray(data)) {
+                data = [];
+                localStorage.setItem('apartment_management_data', JSON.stringify([]));
+              }
+            } catch (e) {
+              console.error('Error parsing stored data:', e);
+              data = [];
+              localStorage.setItem('apartment_management_data', JSON.stringify([]));
+            }
+          }
+          if (dataHandler) {
+            this.dataHandler = dataHandler;
+            window.dataSdk.dataHandler = dataHandler;
+          }
+          if (dataHandler && typeof dataHandler.onDataChanged === 'function') {
+            try {
+              dataHandler.onDataChanged(data);
+            } catch (e) {
+              console.error('Error calling dataHandler.onDataChanged:', e);
+            }
+          }
+          return { isOk: true };
+        } catch (error) {
+          console.error('Data SDK init error:', error);
+          return { isOk: false, error: error.message };
+        }
+      },
+      create: async function(item) {
+        try {
+          if (!item || typeof item !== 'object') {
+            return { isOk: false, error: 'Invalid item' };
+          }
+          let data = [];
+          const storedData = localStorage.getItem('apartment_management_data');
+          if (storedData) {
+            try {
+              data = JSON.parse(storedData);
+              if (!Array.isArray(data)) data = [];
+            } catch (e) {
+              data = [];
+            }
+          }
+          item.__backendId = 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          data.push(item);
+          const jsonString = JSON.stringify(data);
+          localStorage.setItem('apartment_management_data', jsonString);
+          const handler = this.dataHandler || window.dataSdk.dataHandler;
+          if (handler && typeof handler.onDataChanged === 'function') {
+            try {
+              handler.onDataChanged(data);
+            } catch (e) {
+              console.error('Error calling handler.onDataChanged:', e);
+            }
+          }
+          return { isOk: true, data: item };
+        } catch (error) {
+          console.error('Data SDK create error:', error);
+          return { isOk: false, error: error.message };
+        }
+      },
+      update: async function(item) {
+        try {
+          let data = [];
+          const storedData = localStorage.getItem('apartment_management_data');
+          if (storedData) {
+            try {
+              data = JSON.parse(storedData);
+              if (!Array.isArray(data)) data = [];
+            } catch (e) {
+              data = [];
+            }
+          }
+          const index = data.findIndex(d => d.__backendId === item.__backendId);
+          if (index !== -1) {
+            data[index] = item;
+            localStorage.setItem('apartment_management_data', JSON.stringify(data));
+            const handler = this.dataHandler || window.dataSdk.dataHandler;
+            if (handler && typeof handler.onDataChanged === 'function') {
+              try {
+                handler.onDataChanged(data);
+              } catch (e) {
+                console.error('Error calling handler.onDataChanged:', e);
+              }
+            }
+            return { isOk: true, data: item };
+          }
+          return { isOk: false, error: 'Item not found' };
+        } catch (error) {
+          console.error('Data SDK update error:', error);
+          return { isOk: false, error: error.message };
+        }
+      },
+      delete: async function(item) {
+        try {
+          let data = [];
+          const storedData = localStorage.getItem('apartment_management_data');
+          if (storedData) {
+            try {
+              data = JSON.parse(storedData);
+              if (!Array.isArray(data)) data = [];
+            } catch (e) {
+              data = [];
+            }
+          }
+          const filteredData = data.filter(d => d.__backendId !== item.__backendId);
+          localStorage.setItem('apartment_management_data', JSON.stringify(filteredData));
+          const handler = this.dataHandler || window.dataSdk.dataHandler;
+          if (handler && typeof handler.onDataChanged === 'function') {
+            try {
+              handler.onDataChanged(filteredData);
+            } catch (e) {
+              console.error('Error calling handler.onDataChanged:', e);
+            }
+          }
+          return { isOk: true };
+        } catch (error) {
+          console.error('Data SDK delete error:', error);
+          return { isOk: false, error: error.message };
+        }
+      }
+    };
+    console.log('✅ dataSdk initialized inline');
+  </script>
   <script src="_sdk/data_sdk.js"></script>
   <script src="_sdk/element_sdk.js"></script>
   <style>
